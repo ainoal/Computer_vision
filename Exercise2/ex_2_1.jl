@@ -1,29 +1,36 @@
 using Pkg
-#Pkg.add("Plots")
-#Pkg.add("LinearAlgebra")
-#Pkg.add("PlotlyBase")
-#Pkg.add("PlotlyKaleido")
+Pkg.add("Plots")
+Pkg.add("LinearAlgebra")
+Pkg.add("PlotlyBase")
+Pkg.add("PlotlyKaleido")
 using Plots
 using LinearAlgebra
 
 function main()
     # World, robot and camera coordinate frames
-    W = Matrix{Float64}(I, 4, 4)
-    R = [0.6645 -0.6645 0.3420 -2;
+    wTw = Matrix{Float64}(I, 4, 4)
+    wTr = [0.6645 -0.6645 0.3420 -2;
         0.7071 0.7071 0 1;
         -0.2418 0.2418 0.9397 -1;
         0 0 0 1]
-    C = [0.1543 -0.6172 -0.7715 3;
+    wTc = [0.1543 -0.6172 -0.7715 3;
         0.9866 0.0538 0.1543 0;
         0.0538 0.7850 -0.6172 3;
         0 0 0 1]
 
-    plot_frames(W, R, C)
+    plot_frames(wTr, wTc)   # plotting frames relative to world frame
+    plot_frames(inv(wTr), inv(wTr) * wTc)   # relative to robot frame
+    plot_frames(inv(wTc), inv(wTc) * wTr)   # relative to camera frame
 end
+
+# FIX THE FUNCTION DEFINITION: REFERENCE FRAME NOT PASSED TO 
+# THE FUNCTION AS PARAMETER ANYMORE
+
+# + ADD aspect_ratio := equal
 
 # The function gets 3 frames as input parameters and plots all frames
 # relative to the frame given as the first input parameter
-function plot_frames(F1, F2, F3)
+function plot_frames(F2, F3)
     o = [0; 0; 0; 1]    # origin of the reference coordinate frame
 
     # The length between origin and a point on an axis is one unit
