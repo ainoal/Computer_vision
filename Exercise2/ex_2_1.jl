@@ -16,21 +16,15 @@ function main()
         0.0538 0.7850 -0.6172 3;
         0 0 0 1]
 
-    plot_frames(wTr, wTc)   # plotting frames relative to world frame
-    plot_frames(inv(wTr), inv(wTr) * wTc)   # relative to robot frame
-    plot_frames(inv(wTc), inv(wTc) * wTr)   # relative to camera frame
+    plot_frames("World", wTr, "Robot", wTc, "Camera")   # plotting frames relative to world frame
+    plot_frames("Robot", inv(wTr), "World", inv(wTr) * wTc, "Camera")   # relative to robot frame
+    plot_frames("Camera", inv(wTc), "World", inv(wTc) * wTr, "Robot")   # relative to camera frame
 end
 
-# FIX THE FUNCTION DEFINITION: REFERENCE FRAME NOT PASSED TO 
-# THE FUNCTION AS PARAMETER ANYMORE
-
-# + ADD aspect_ratio := equal
-
-# Plots.current() to get the current plot
-
-# The function gets 3 frames as input parameters and plots all frames
-# relative to the frame given as the first input parameter
-function plot_frames(F2, F3)
+# The function gets 2 frames as input parameters and plots them
+# relative to a reference frame, which is always represented with
+# an identity matrix. 
+function plot_frames(F1_name, F2, F2_name, F3, F3_name)
     o = [0; 0; 0; 1]    # origin of the reference coordinate frame
 
     # The length between origin and a point on an axis is one unit
@@ -76,6 +70,10 @@ function plot_frames(F2, F3)
         color=RGB(0, 1, 0), markershape=:none,aspect_ratio=:equal)
     p =plot!([o3[1], w3[1]], [o3[2], w3[2]], [o3[3], w3[3]],
         color=RGB(0, 0, 1), markershape=:none,aspect_ratio=:equal)
+
+    annotate!(u[1], u[2], u[3], F1_name)
+    annotate!(u2[1], u2[2], u2[3], F2_name)
+    annotate!(u3[1], u3[2], u3[3], F3_name)
 
     display(p)
 
