@@ -1,10 +1,8 @@
 using Pkg
-Pkg.add("Plots")
-Pkg.add("LinearAlgebra")
-Pkg.add("PlotlyBase")
-Pkg.add("PlotlyKaleido")
 using Plots
 using LinearAlgebra
+plotlyjs()
+include("plots_plotly_extra.jl")
 
 function main()
     # World, robot and camera coordinate frames
@@ -28,6 +26,8 @@ end
 
 # + ADD aspect_ratio := equal
 
+# Plots.current() to get the current plot
+
 # The function gets 3 frames as input parameters and plots all frames
 # relative to the frame given as the first input parameter
 function plot_frames(F2, F3)
@@ -39,13 +39,13 @@ function plot_frames(F2, F3)
     w = [0; 0; 1; 1];   # point on z axis
 
     # Plotting the reference frame
-    plotly()
+    
     plot([o[1], u[1]], [o[2], u[2]], [o[3], u[3]], 
-        color=RGB(1, 0, 0), length=10, markershape=:none)
+        color=RGB(1, 0, 0), markershape=:none,aspect_ratio=:equal)
     plot!([o[1], v[1]], [o[2], v[2]], [o[3], v[3]], 
-        color=RGB(0, 1, 0), length=10, markershape=:none)
+        color=RGB(0, 1, 0), markershape=:none,aspect_ratio=:equal)
     plot!([o[1], w[1]], [o[2], w[2]], [o[3], w[3]],
-        color=RGB(0, 0, 1), length=10, markershape=:none)
+        color=RGB(0, 0, 1), markershape=:none,aspect_ratio=:equal)
 
     # Multiplying the points of the other frames with the 
     # transformation matrices
@@ -64,18 +64,18 @@ function plot_frames(F2, F3)
 
     # Plotting the axes of the other frames
     plot!([o2[1], u2[1]], [o2[2], u2[2]], [o2[3], u2[3]], 
-        color=RGB(1, 0, 0), length=10, markershape=:none)
+        color=RGB(1, 0, 0), markershape=:none,aspect_ratio=:equal)
     plot!([o2[1], v2[1]], [o2[2], v2[2]], [o2[3], v2[3]], 
-        color=RGB(0, 1, 0), length=10, markershape=:none)
+        color=RGB(0, 1, 0), markershape=:none,aspect_ratio=:equal)
     plot!([o2[1], w2[1]], [o2[2], w2[2]], [o2[3], w2[3]],
-        color=RGB(0, 0, 1), length=10, markershape=:none)
+        color=RGB(0, 0, 1), markershape=:none,aspect_ratio=:equal)
     
     plot!([o3[1], u3[1]], [o3[2], u3[2]], [o3[3], u3[3]], 
-        color=RGB(1, 0, 0), length=10, markershape=:none)
+        color=RGB(1, 0, 0), markershape=:none,aspect_ratio=:equal)
     plot!([o3[1], v3[1]], [o3[2], v3[2]], [o3[3], v3[3]], 
-        color=RGB(0, 1, 0), length=10, markershape=:none)
+        color=RGB(0, 1, 0), markershape=:none,aspect_ratio=:equal)
     p =plot!([o3[1], w3[1]], [o3[2], w3[2]], [o3[3], w3[3]],
-        color=RGB(0, 0, 1), length=10, markershape=:none)
+        color=RGB(0, 0, 1), markershape=:none,aspect_ratio=:equal)
 
     display(p)
 
