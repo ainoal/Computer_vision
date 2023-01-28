@@ -1,3 +1,6 @@
+# The program calculates the pixel coordinates of the projection of a point
+# given in the exercise and prints them on the console.
+
 using Unitful.DefaultSymbols: mm, µm, m
 using Unitful
 

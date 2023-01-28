@@ -2,7 +2,7 @@ using Pkg
 using Plots
 using LinearAlgebra
 plotlyjs()
-include("plots_plotly_extra.jl")
+include(joinpath(@__DIR__, "lib/plots_plotly_extra.jl"))
 
 function main()
     # World, robot and camera coordinate frames
