@@ -1,3 +1,9 @@
+# Note: since I did not have time to figure out subplots today,
+# the figures are displayed one after another on the same window,
+# with 5 second sleep time in between. 
+# If one wishes to view the first or second image permanently on the screen,
+# please comment out line 84 displaying figure 3 (and line 55 displaying fig2)
+
 using MAT
 using LinearAlgebra
 include(joinpath(@__DIR__, "lib/color_plots.jl"))
@@ -19,7 +25,7 @@ function main()
     plot_frame!(data["WTC"])
     display(fig);
 
-    #sleep(5)
+    sleep(5)
 
     # Exercise part b: Construct matrix M and use it to find image plane
     # projections of the given points. 
@@ -48,7 +54,7 @@ function main()
     plot_color_projected!(a2, projections[1:2, :], data["colors"])
     display(fig2)
 
-    sleep(10)
+    sleep(5)
 
     # Exercise part d: Calculate point projection using weak-perspective camera.
     #cam_coords = inv(data["WTC"]) * data["points"]

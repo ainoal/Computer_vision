@@ -27,8 +27,5 @@ you get (-af/a, 0/a) = (-f, 0).
 
 For estimating how far a point is from the camera, this can pose a problem.
 However, the projection tells us the direction in which a point is relative
-to the camera. 
-
-*********************
-If we are also able to tell whether the point is on focus or not, we can
-find out things about the distance based on the depth of field.
+to the camera. If we are also able to tell whether the point is on focus or not, 
+we can find out things about the distance based on the depth of field.

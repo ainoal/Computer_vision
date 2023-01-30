@@ -5,7 +5,7 @@ annotate!(x, y, z, text) = annotate!(Plots.current(), x, y, z, text)
 annotate!(x::Number, y::Number, z::Number, text::AbstractString) = annotate!(Plots.current(), [x], [y], [z], [text])
 annotate!(p, x::Number, y::Number, z::Number, text::AbstractString) = annotate!(p, [x], [y], [z], [text])
 function annotate!(p, x, y, z, text)
-    plot!(p, x, y, z, label=nothing)
+    Plots.plot!(p, x, y, z, label=nothing)
     attr = p.series_list[end].plotattributes.explicit
     attr[:text] = text
     attr[:mode] = "text"

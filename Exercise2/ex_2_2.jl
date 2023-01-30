@@ -16,8 +16,8 @@ function main()
         0 0 1]
 
     transf = K * [1; 0; 8]          # Transformation
-    p = (transf[1]/transf[3], transf[2]/transf[3])  # Divide by z
-    println("The pixel coordinates are p = (", p[1], ", ", p[2], ").")
+    p = (round(transf[1]/transf[3]), round(transf[2]/transf[3]))  # Divide by z
+    println("The pixel coordinates are p = (", Int(p[1]), ", ", Int(p[2]), ").")
 
     return nothing
 end
