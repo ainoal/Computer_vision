@@ -12,13 +12,14 @@ function main()
     f = 16*10^-3        # Focal length
 
     # Exercise part a: plot given colored points and camera frame.
+    fig = Makie.Figure()
     fig, ax1, _ = plot_color(data["points"], data["colors"])
     ax2 = Axis(fig[1, 2]; aspect=DataAspect(), yreversed=true)
     plot_color_projected!(ax2, data["points"][1:2, :], data["colors"])
     plot_frame!(data["WTC"])
-    display(fig)
+    display(fig);
 
-    sleep(5)
+    #sleep(5)
 
     # Exercise part b: Construct matrix M and use it to find image plane
     # projections of the given points. 
@@ -47,24 +48,25 @@ function main()
     plot_color_projected!(a2, projections[1:2, :], data["colors"])
     display(fig2)
 
-    sleep(5)
+    sleep(10)
 
     # Exercise part d: Calculate point projection using weak-perspective camera.
-    cam_coords = inv(data["WTC"]) * data["points"]
+    #cam_coords = inv(data["WTC"]) * data["points"]
     sum_of_zs = 0
-    for i in 1:(Int(length(cam_coords)/4))
-        sum_of_zs = sum_of_zs + cam_coords[3, i]
+    for i in 1:19600
+        temp = inv(data["WTC"]) * data["points"][1:4,1]
+        sum_of_zs = sum_of_zs + temp[3, 1]
     end
-    Z = sum_of_zs / length(cam_coords)
+    Z = sum_of_zs / 19600
 
     Mwp = [-f/s_x 0 0 Z*o_x;
         0 -f/s_y 0 Z*o_y;
         0 0 0 Z]
 
-    weak_projection = Mwp * cam_coords
+    weak_projection = Mwp * inv(data["WTC"]) * data["points"]
 
     # Normalize the coordinates
-    for i in 1:(Int(length(weak_projection)/4))
+    for i in 1:(Int(length(weak_projection)/3))
         weak_projection[1, i] = weak_projection[1, i] / weak_projection[3, i]
         weak_projection[2, i] = weak_projection[2, i] / weak_projection[3, i]
     end
