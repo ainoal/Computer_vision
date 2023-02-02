@@ -1,4 +1,4 @@
-# Written before I realized there are ready functions for image filtering
+# Written before I realized there are ready functions for filtering
 # with Julia.
 
 using Statistics
@@ -44,6 +44,7 @@ function linear_filtering(values, kernel)
     return linear_filtered
 end
 
+# The function returns the neighborhood of a value in an array
 function neighborhood(m, i, values)
     len = length(values)
     half_neighborhood = Int(floor(m/2))
@@ -74,7 +75,7 @@ function neighborhood(m, i, values)
             push!(neighborhood, values[len])
         end
 
-    #middle of the array
+    # Middle of the array
     else
         neighborhood = values[(i - half_neighborhood):(i + half_neighborhood)]
     end
