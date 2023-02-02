@@ -20,94 +20,65 @@ function main()
 end
 
 function median_filtering(values, m)
-    half_neighborhood = Int(floor(m/2))
     len = length(values)
-    #println(len)
     median_filtered = zeros(len, 1)
-    #print(values[1])
     for i in 1:len
-        # If we are handling the beginning of the array, to be able to use the 
-        # filter, we use padding at the beginning of the array. The padding
-        #  gets the same value as the first entry in the values (in this exercise 2).
-        if (i <= half_neighborhood)
-            neighborhood = Vector{Int64}()
-            diff = half_neighborhood - i + 1
-            # The for loop handles the padding
-            for j in 1:diff
-                #neighborhood[j] = values[1]
-                push!(neighborhood, values[1])
-            end
-            # For the rest of the filter, we use the actual values in the array.
-            for k in 1:(m - diff)
-                push!(neighborhood, values[k])
-            end
-            #println(neighborhood)
-        # Handle the end of the array in a similar manner as the beginning of it.
-        elseif (len - i < half_neighborhood)
-            neighborhood = []
-            diff = half_neighborhood - (len - i) + 1
-            for j in 1:(m - diff)
-                #neighborhood[j] = values[j]
-                push!(neighborhood, values[len-j])
-            end
-            for k in 1:diff
-                push!(neighborhood, values[len])
-            end
-            #println(neighborhood)
-        else
-            neighborhood = values[(i - half_neighborhood):(i + half_neighborhood)]
-        end
-        median_filtered[i] = median(neighborhood)
+        neighbors = neighborhood(m, i, values)
+        median_filtered[i] = median(neighbors)
     end
-    #print(median_filtered)
     return median_filtered
 end
 
 function linear_filtering(values, kernel)
     m = length(kernel)
-    half_neighborhood = Int(floor(m/2))
     len = length(values)
     linear_filtered = zeros(len, 1)
     for i in 1:len
         sum_of_neighborhood_values = 0
-        if (i <= half_neighborhood)
-            neighborhood = Vector{Int64}()
-            diff = half_neighborhood - i + 1
-            # The for loop handles the padding
-            for j in 1:diff
-                #neighborhood[j] = values[1]
-                push!(neighborhood, values[1])
-            end
-            # For the rest of the filter, we use the actual values in the array.
-            for k in 1:(m - diff)
-                push!(neighborhood, values[k])
-            end
-            #print("if ")
-            #println(neighborhood)
-        # Handle the end of the array in a similar manner as the beginning of it.
-        elseif (len - i < half_neighborhood)
-            neighborhood = []
-            diff = half_neighborhood - (len - i) + 1
-            for j in 1:(m - diff)
-                #neighborhood[j] = values[j]
-                push!(neighborhood, values[len-j])
-            end
-            for k in 1:diff
-                push!(neighborhood, values[len])
-            end
-            #print("elseif ")
-            #println(neighborhood)
-        else
-            neighborhood = values[(i - half_neighborhood):(i + half_neighborhood)]
-            #print("else ")
-            #println(neighborhood)
-        end
-        for j in 1:length(neighborhood)
-            sum_of_neighborhood_values = sum_of_neighborhood_values + neighborhood[j] * kernel[j]
+        neighbors = neighborhood(m, i, values)
+        for j in 1:length(neighbors)
+            sum_of_neighborhood_values = sum_of_neighborhood_values + neighbors[j] * kernel[j]
         end
         linear_filtered[i] = sum_of_neighborhood_values
     end
     return linear_filtered
+end
+
+function neighborhood(m, i, values)
+    len = length(values)
+    half_neighborhood = Int(floor(m/2))
+
+    # If we are handling the beginning of the array, to be able to use the 
+    # filter, we use padding at the beginning of the array. The padding
+    #  gets the same value as the first entry in the values (in this exercise 2).
+    if (i <= half_neighborhood)
+        neighborhood = Vector{Int64}()
+        diff = half_neighborhood - i + 1
+        # The for loop handles the padding
+        for j in 1:diff
+            push!(neighborhood, values[1])
+        end
+        # For the rest of the filter, we use the actual values in the array.
+        for k in 1:(m - diff)
+            push!(neighborhood, values[k])
+        end
+        
+    # Handle the end of the array in a similar manner as the beginning of it.
+    elseif (len - i < half_neighborhood)
+        neighborhood = []
+        diff = half_neighborhood - (len - i) + 1
+        for j in 1:(m - diff)
+            push!(neighborhood, values[len-j])
+        end
+        for k in 1:diff
+            push!(neighborhood, values[len])
+        end
+
+    #middle of the array
+    else
+        neighborhood = values[(i - half_neighborhood):(i + half_neighborhood)]
+    end
+    return neighborhood
 end
 
 main()
