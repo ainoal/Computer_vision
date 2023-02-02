@@ -13,7 +13,7 @@ When you divide the x and y coordinates by z, you get
 the projected coordinates (-f, 0) on the image plane.
 
 The point's projection is along the negative x axis, depending
-on the depth of field.
+on the focal length.
 
 Which Euclidean points project to the same location?
 - Points (a, 0, a)
@@ -28,4 +28,4 @@ you get (-af/a, 0/a) = (-f, 0).
 For estimating how far a point is from the camera, this can pose a problem.
 However, the projection tells us the direction in which a point is relative
 to the camera. If we are also able to tell whether the point is on focus or not, 
-we can find out things about the distance based on the depth of field.
+we can find out things about the distance based on the focal length.

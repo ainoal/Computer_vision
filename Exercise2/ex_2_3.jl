@@ -60,7 +60,7 @@ function main()
     #cam_coords = inv(data["WTC"]) * data["points"]
     sum_of_zs = 0
     for i in 1:19600
-        temp = inv(data["WTC"]) * data["points"][1:4,1]
+        temp = inv(data["WTC"]) * data["points"][1:4,i]
         sum_of_zs = sum_of_zs + temp[3, 1]
     end
     Z = sum_of_zs / 19600

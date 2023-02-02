@@ -7,9 +7,9 @@ using Unitful
 function main() 
     o_x =  320          # Optical center of the camera
     o_y = 240
-    s_x = 10*10^-6      # Effective size of pixel
-    s_y = 10*10^-6
-    f = 16*10^-3        # Focal length
+    s_x = 10µm          # Effective size of pixel
+    s_y = 10µm
+    f = 16mm            # Focal length
 
     K = [-f/s_x 0 o_x;
         0 -f/s_y o_y;
