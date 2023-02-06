@@ -5,7 +5,7 @@ using ImageFiltering
 # Show by counterexample that median filtering is not separable.
 function main()
     lena = load(joinpath(@__DIR__, "../data/lena_bw.png"))
-    salt_pepper_noise_p = 0.5
+    salt_pepper_noise_p = 0.4
     sp_lena = salt_pepper(lena, salt_pepper_noise_p)
     p = plot_image(sp_lena, title = "Image to be filtered")
 
