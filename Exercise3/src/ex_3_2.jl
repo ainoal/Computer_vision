@@ -45,12 +45,12 @@ function main()
 
     # Add speckle noise with variance v = 0.02
     # and compare different filters against each other
-    #=speckle_noise_v = 0.02
+    speckle_noise_v = 0.02
     speckle_lena = speckle_noise(lena, speckle_noise_v)
     p3 = plot_image(speckle_lena, title = "Speckle noise")
 
     linear_filtering(p3, speckle_lena)
-    median_filtering(p3, speckle_lena)=#
+    median_filtering(p3, speckle_lena)
 
     # It is possible to computationally measure the visual quality. However, this
     # can be very tricky. The human perception of image quality can be very 
@@ -105,5 +105,8 @@ end
 
 plot_image(img; kws...) = 
     plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
+
+speckle_noise(img, sigma) = 
+    img .+ 2 * sigma * sqrt(3) .* img .* (rand(eltype(img), size(img)) .- 0.5)
 
 main()
