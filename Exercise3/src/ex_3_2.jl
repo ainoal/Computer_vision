@@ -1,5 +1,3 @@
-# NOTE TO SELF: CHECK THE VARIANCE OF THE GAUSSIAN NOICE
-
 using Images
 using Plots
 using Noise
@@ -13,7 +11,6 @@ function main()
 
     # Add zero-mean gaussian noise with variance 0.01
     # and compare different filters against each other
-    # CHECK THE VARIANCE
     gauss_noise_sigma = 0.1
     gaussian_noise_lena = add_gauss(lena, gauss_noise_sigma, clip=true)
     p1 = plot_image(gaussian_noise_lena, title = "Gaussian noise")
@@ -45,12 +42,21 @@ function main()
 
     # Add speckle noise with variance v = 0.02
     # and compare different filters against each other
-    speckle_noise_v = 0.02
+    speckle_noise_v = 0.2
     speckle_lena = speckle_noise(lena, speckle_noise_v)
-    p3 = plot_image(speckle_lena, title = "Speckle noise")
+    p3 = plot_image(speckle_lena, title = "Speckle noise");
 
     linear_filtering(p3, speckle_lena)
     median_filtering(p3, speckle_lena)
+
+    # In general, the smaller the Gaussian kernel or the median filter window size,
+    # the less blurry the image becomes. The larger the kernel is, the more 
+    # effective the filter is at removing noise. Thus, we should try to use the
+    # smallest kernel possible that removes noise from the image in hand
+    # sufficiently enough. Gaussian filtering works well for Gaussian noise or
+    # speckle noise, but median filtering is way better for salt-and-pepper noise.
+    # In Gaussian filtering, a bigger variance should also mean choosing a bigger
+    # kernel size.
 
     # It is possible to computationally measure the visual quality. However, this
     # can be very tricky. The human perception of image quality can be very 
@@ -66,19 +72,19 @@ function linear_filtering(p, img)
     # i. σ = 0.5
     sigma_i = 0.5
     img_gaussian_i = imfilter(img, Kernel.gaussian(sigma_i))
-    p_gaussian_i = plot_image(img_gaussian_i; title = "Gaussian, σ = $sigma_i")
+    p_gaussian_i = plot_image(img_gaussian_i; title = "Gaussian, σ = $sigma_i");
 
     # ii. σ = 1
     sigma_ii = 1
     img_gaussian_ii = imfilter(img, Kernel.gaussian(sigma_ii))
-    p_gaussian_ii = plot_image(img_gaussian_ii; title = "Gaussian, σ = $sigma_ii")
+    p_gaussian_ii = plot_image(img_gaussian_ii; title = "Gaussian, σ = $sigma_ii");
 
     # iii. σ = 2
     sigma_iii = 2
     img_gaussian_iii = imfilter(img, Kernel.gaussian(sigma_iii))
-    p_gaussian_iii = plot_image(img_gaussian_iii; title = "Gaussian, σ = $sigma_iii")
+    p_gaussian_iii = plot_image(img_gaussian_iii; title = "Gaussian, σ = $sigma_iii");
 
-    plt = plot(p, p_gaussian_i, p_gaussian_ii, p_gaussian_iii; size=(700, 700), layout=@layout [x x; x x])
+    plt = plot(p, p_gaussian_i, p_gaussian_ii, p_gaussian_iii; size=(700, 700), layout=@layout [x x; x x]);
     display(plt)
 end
 
@@ -87,19 +93,19 @@ function median_filtering(p, img)
     # i. filter size 3 x 3
     window_i = (3, 3)
     img_median_i = mapwindow(median, img, window_i)
-    p_median_i = plot_image(img_median_i; title = "Median, $(join(window_i, " × ")) window")
+    p_median_i = plot_image(img_median_i; title = "Median, $(join(window_i, " × ")) window");
 
     # ii. filter size 5 x 5
     window_ii = (5, 5)
     img_median_ii = mapwindow(median, img, window_ii)
-    p_median_ii = plot_image(img_median_ii; title = "Median, $(join(window_ii, " × ")) window")
+    p_median_ii = plot_image(img_median_ii; title = "Median, $(join(window_ii, " × ")) window");
 
     # iii. filter size 9 x 9
     window_iii = (9, 9)
     img_median_iii = mapwindow(median, img, window_iii)
-    p_median_iii = plot_image(img_median_iii; title = "Median, $(join(window_iii, " × ")) window")
+    p_median_iii = plot_image(img_median_iii; title = "Median, $(join(window_iii, " × ")) window");
 
-    plt = plot(p, p_median_i, p_median_ii, p_median_iii; size=(700, 700), layout=@layout [x x; x x])
+    plt = plot(p, p_median_i, p_median_ii, p_median_iii; size=(700, 700), layout=@layout [x x; x x]);
     display(plt)
 end
 

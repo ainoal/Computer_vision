@@ -1,6 +1,8 @@
 using Images
 using Plots
 using ImageFiltering
+using Noise
+using Statistics
 
 # Show by counterexample that median filtering is not separable.
 function main()

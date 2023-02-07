@@ -34,8 +34,8 @@ function main()
 
     # Some other things that can cause difficulties with image segmantation, based 
     # on my experience with this exercise:
-    # - When working in the RGB space, you need to filter out very light colors whose
-    #   value of the color channel that you want to detect is high.
+    # When working in the RGB space, you need to filter out very light colors whose
+    # value of the color channel that you want to detect is high.
 
 end
 

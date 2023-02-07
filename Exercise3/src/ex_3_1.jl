@@ -1,5 +1,8 @@
-# Written before I realized there are ready functions for filtering
-# with Julia.
+# Started before I realized there are ready functions for filtering
+# with Julia and continued as an exercise to better understand the 
+# concepts behind different filters.
+# The quick way to solve this exercise would be by using imfilter()
+# function with Gaussian kernel and mapwindow() with median filter.
 
 using Statistics
 using Plots
