@@ -1,3 +1,7 @@
+# NOTE FOR SELF: remember to implement canny ImageEdgeDetection
+# and answer the questions.
+# More elegant way to get the dimensions
+
 # QUESTIONS for the exercise class: Sobel and Brewitt kernel:
 # what are they, differences, when to use each...?
 
