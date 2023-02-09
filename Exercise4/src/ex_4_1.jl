@@ -2,9 +2,6 @@
 # and answer the questions.
 # More elegant way to get the dimensions
 
-# QUESTIONS for the exercise class: Sobel and Brewitt kernel:
-# what are they, differences, when to use each...?
-
 using Images
 using Plots
 using ImageFiltering
@@ -14,7 +11,7 @@ using ImageEdgeDetection: Percentile
 
 function main()
     blocks = load(joinpath(@__DIR__, "../data/blocks_bw.png"))
-    dimensions = [576, 768]
+    dimensions = size(blocks)
 
     # Smooth out noise
     sigma = 0.5
@@ -22,8 +19,6 @@ function main()
     p_gaussian = plot_image(img_gaussian; title = "Gaussian, σ = $sigma");
 
     # Find gradients G_x and G_y
-    # QUESTION for the exercise class: Sobel and Brewitt kernel:
-    # what are they, differences, when to use each...?
     Gx, Gy = imgradients(img_gaussian, KernelFactors.sobel)
     
     Gx_normalized = normalize(Gx)
