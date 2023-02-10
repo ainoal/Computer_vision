@@ -4,8 +4,9 @@ using LinearAlgebra
 
 function main()
     blocks = load(joinpath(@__DIR__, "../data/blocks_bw.png"))
-    corners = find_corners(blocks, 3, 0.02)
-    plot_image(blocks)
+    corners = find_corners(blocks, 3, 0)
+    #plot_image(blocks)
+    plot(blocks)
     #print(corners)
     #L = [(71, 295), (94, 156)]
     p = plot!(corners, seriestype=:scatter)
@@ -17,6 +18,9 @@ function find_corners(img, N, t, k=0.04)
     pruned_corners = zeros(dimensions[1], dimensions[2])
     Ix, Iy = imgradients(img, KernelFactors.sobel)
     half_neighborhood = div(N, 2)
+
+
+    #mapwindow(sum_neighborhood, Ix, N)
     #L = Vector{Float64}()
 
     # For each pixel
@@ -41,7 +45,7 @@ function find_corners(img, N, t, k=0.04)
                     end
                 end
             end
-            # Construct matrix t
+            # Construct matrix T
             T = [sum_Ix_power2 sum_Ix_Iy; sum_Ix_Iy sum_Iy_power2]
             # Calculate eigenvalues
             eig = eigvals(T)
@@ -80,7 +84,7 @@ function find_corners(img, N, t, k=0.04)
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
             if(cornerness[i, j] != 0)
-                push!(corners, (i, j))
+                push!(corners, (j, i))
             end
         end
     end
@@ -89,7 +93,11 @@ function find_corners(img, N, t, k=0.04)
     return corners
 end
 
-plot_image(img; kws...) = 
-    plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
+#=function sum_neighborhood()
+    
+end=#
+
+#plot_image(img; kws...) = 
+#    plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
 
 main()
