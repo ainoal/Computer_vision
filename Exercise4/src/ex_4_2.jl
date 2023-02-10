@@ -4,7 +4,10 @@ using LinearAlgebra
 
 function main()
     blocks = load(joinpath(@__DIR__, "../data/blocks_bw.png"))
-    corners = find_corners(blocks, 3, 0)
+    sigma = 0
+    img_gaussian = imfilter(blocks, Kernel.gaussian(sigma))
+    println("Looking for corners")
+    corners = find_corners(img_gaussian, 9, 0.02)
     #plot_image(blocks)
     plot(blocks)
     #print(corners)
@@ -32,7 +35,7 @@ function find_corners(img, N, t, k=0.04)
             sum_Ix_power2 = 0
             sum_Iy_power2 = 0
             sum_Ix_Iy = 0
-            # INSTEAD OF THIS IMPLEMENTATION: use mapwindow()
+
             # Special cases on the edges of the image: to be implemented later
             if (((i-half_neighborhood) < 1) ||((j-half_neighborhood)<1)|| ((i+half_neighborhood) > dimensions[1]) ||((j+half_neighborhood)>dimensions[2]))
             else
@@ -50,12 +53,9 @@ function find_corners(img, N, t, k=0.04)
             # Calculate eigenvalues
             eig = eigvals(T)
             R = eig[1] * eig[2] - k * (eig[1] - eig[2])^2
-            #println(eigenvalues)
 
-            # FROM HERE: change the code according to slides p. 40
             if (R > t)
                 cornerness[i, j] = R
-                #print("cornerness > 0")
             else
                 cornerness[i, j] = 0
             end
@@ -66,6 +66,7 @@ function find_corners(img, N, t, k=0.04)
     #print(size(minmax))
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
+            # REMEMBER SPECIAL CASES
             if (((i-half_neighborhood) < 1) ||((j-half_neighborhood)<1)|| ((i+half_neighborhood) > dimensions[1]) ||((j+half_neighborhood)>dimensions[2]))
             else
                 pruned_corners[i, j] = 1
@@ -89,7 +90,6 @@ function find_corners(img, N, t, k=0.04)
         end
     end
 
-    println(":)")
     return corners
 end
 
