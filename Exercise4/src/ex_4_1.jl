@@ -1,7 +1,3 @@
-# NOTE FOR SELF: remember to implement canny ImageEdgeDetection
-# and answer the questions.
-# More elegant way to get the dimensions
-
 using Images
 using Plots
 using ImageFiltering
@@ -12,7 +8,7 @@ using ImageEdgeDetection: Percentile
 function main()
     blocks = load(joinpath(@__DIR__, "../data/blocks_bw.png"))
     dimensions = size(blocks)
-    p_blocks = plot_image(blocks)
+    p_blocks = plot_image(blocks; title = "Original image")
 
     # Smooth out noise
     sigma = 0.5
@@ -43,18 +39,18 @@ function main()
     end
 
     binary = thinning(binary_img)
-    #Gy_img = plot_image(grayy)
-    edges = plot_image(Gray.(binary))
+    edges = plot_image(Gray.(binary), title = "Edges")
     
     # Compare the results to canny edge detection.
-    #sigma2 = 0.5
-    #img_gaussian2 = imfilter(blocks, Kernel.gaussian(sigma2))
     canny_alg = Canny(spatial_scale = 3, high = Percentile(75), low = Percentile(10))
     img_canny = detect_edges(img_gaussian, canny_alg)
-    plot_canny = plot_image(img_canny)
+    plot_canny = plot_image(img_canny, title = "Edges with canny detection")
 
-    p = plot(p_blocks, p_gaussian, edges, plot_canny)
+    p = plot(p_blocks, p_gaussian, edges, plot_canny; size = (700, 700),
+        layout=@layout [x x; x x])
 end
+
+
 
 plot_image(img; kws...) = 
     plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
