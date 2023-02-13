@@ -12,6 +12,7 @@ using ImageEdgeDetection: Percentile
 function main()
     blocks = load(joinpath(@__DIR__, "../data/blocks_bw.png"))
     dimensions = size(blocks)
+    p_blocks = plot_image(blocks)
 
     # Smooth out noise
     sigma = 0.5
@@ -26,12 +27,8 @@ function main()
     grayx = Gx_normalized .|> Gray
     grayy = Gy_normalized .|> Gray
 
-
     t = 0.74
 
-    print(size(grayx))
-
-    # HUOM: EI TARVITA MOLEMPIA KUVIA, KOSKA NE OVAT SAMAT
     binary_img = falses(dimensions[1], dimensions[2])
 
     # For each pixel
@@ -39,20 +36,24 @@ function main()
         for j in 1:dimensions[2]
             if (t < sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2))
                 binary_img[i, j] = true
-                grayy[i, j] = 1
             else
                 binary_img[i, j] = false
-                grayy[i, j] = 0
             end
         end
     end
 
     binary = thinning(binary_img)
-    #Gx_img = plot_image(grayx)
-    Gy_img = plot_image(grayy)
+    #Gy_img = plot_image(grayy)
     edges = plot_image(Gray.(binary))
     
-    p = plot(p_gaussian, edges, Gy_img)
+    # Compare the results to canny edge detection.
+    #sigma2 = 0.5
+    #img_gaussian2 = imfilter(blocks, Kernel.gaussian(sigma2))
+    canny_alg = Canny(spatial_scale = 3, high = Percentile(75), low = Percentile(10))
+    img_canny = detect_edges(img_gaussian, canny_alg)
+    plot_canny = plot_image(img_canny)
+
+    p = plot(p_blocks, p_gaussian, edges, plot_canny)
 end
 
 plot_image(img; kws...) = 
