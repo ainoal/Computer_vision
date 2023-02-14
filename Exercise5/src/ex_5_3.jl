@@ -21,14 +21,15 @@ function main()
     grayx = Gx_normalized .|> Gray
     grayy = Gy_normalized .|> Gray
 
-    t = 0.73
+    t1 = 0.75
+    t2 = 0.70
 
     binary_img = falses(reverse(dimensions))
 
     # For each pixel
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
-            if (t < sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2))
+            if ((t1 < sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2)) || t2 > sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2))
                 binary_img[i, j] = true
             else
                 binary_img[i, j] = false
@@ -37,13 +38,8 @@ function main()
     end
 
     binary = thinning(binary_img)
-    edges = plot_image(Gray.(binary_img), title = "Edges")
+    edges = plot_image(Gray.(binary), title = "Edges")
 
-    #=canny_alg = Canny(spatial_scale = 3, high = Percentile(80), low = Percentile(10))
-    img_canny = detect_edges(img_gaussian, canny_alg)
-    p_canny = plot_image(img_canny, title = "Edges with canny detection")
-    p = plot(p_gaussian, p_canny; size = (700, 350), layout=@layout [x x])
-    display(p)=#
 
 end
 
