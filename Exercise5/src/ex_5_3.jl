@@ -8,11 +8,6 @@ function main()
     img = load(joinpath(@__DIR__, "../data/circle.png"))
     dimensions = size(img)
 
-    # Smooth out noise
-    #sigma = 0
-    #img_gaussian = imfilter(img, Kernel.gaussian(sigma))
-    #p_gaussian = plot_image(img_gaussian; title = "Gaussian, σ = $sigma");
-
     # Find gradients G_x and G_y
     Gx, Gy = imgradients(img, KernelFactors.sobel)
     
