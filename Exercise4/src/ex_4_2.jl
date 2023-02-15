@@ -51,7 +51,6 @@ function find_corners(img, N, t, k=0.04)
                 # important to us, we should implement e.g. padding with the same values as
                 # the pixels at the edge of the image.
             else
-                #mapwindow(sum, Ix, N)
                 for m in (i-half_neighborhood):(i+half_neighborhood)
                     for n in (j-half_neighborhood):(j+half_neighborhood)
                         sum_Ix_power2 += (Ix[m, n])^2

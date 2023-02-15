@@ -21,12 +21,13 @@ function main()
 
     # Exercise part b: Find local extrema in D.
     # Local features can be found by finding local extrema in the stack of DoG.
-    window = 3
-    #println(gaussians[1])
-    minmax = mapwindow(extrema, D, window)
-    #=for j in 1:4
-        minmax = mapwindow(extrema, D, window)
-    end=#
+    window = (3, 3)
+    for k in 1:4
+        minmax = mapwindow(extrema, D[k], window)
+        # TODO: Find minmax of the higher and lower level as well and update
+        # minmax according to that
+    end
+
 end
 
 main()
