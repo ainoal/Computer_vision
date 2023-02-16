@@ -2,13 +2,35 @@ using Images
 using Plots
 using ImageEdgeDetection
 using ImageEdgeDetection: Percentile
+using LinearAlgebra
+using Random
 
 function main()
     # Exercise part a: Load the image and perform edge detection.
     img = load(joinpath(@__DIR__, "../data/circle.png"))
     edge_points = edge_detection(img)
 
+    # WHAT IS THE BEAUTIFUL WAY TO IMPLEMENT THIS?:
+    edgepoints_size = 161
+    #x = size(getfield.(edge_points, 2))
+    #println(x)
 
+    # Exercise part b: Implement SVD
+    X = zeros(edgepoints_size, 6)
+    #println(edge_points[1][1])
+    # Construct matrix X that represents the circle.
+    for i in 1:edgepoints_size
+        X[i, 1] = (edge_points[i][1])^2
+        X[i, 2] = edge_points[i][1] * edge_points[i][2]
+        X[i, 3] = (edge_points[i][2])^2
+        X[i, 4] = edge_points[i][1]
+        X[i, 5] = edge_points[i][2]
+        X[i, 6] = 1
+    end
+
+    # Use SVD for solving the resulting set of linear equations.
+    svd_vals = svd(X)
+    
 end
 
 function edge_detection(img)
@@ -41,6 +63,7 @@ function edge_detection(img)
     # Thin the edges.
     binary = thinning(binary_img)
     edges = plot_image(Gray.(binary), title = "Edges")
+    display(edges)
 
     # Make a list of the pixels along the edge.
     list = []
