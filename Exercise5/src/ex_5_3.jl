@@ -16,16 +16,14 @@ function main()
     #println(x)
 
     # Exercise part b: Implement SVD
-    X = zeros(edgepoints_size, 6)
+    X = zeros(edgepoints_size, 4)
     #println(edge_points[1][1])
     # Construct matrix X that represents the circle.
     for i in 1:edgepoints_size
-        X[i, 1] = (edge_points[i][1])^2
-        X[i, 2] = edge_points[i][1] * edge_points[i][2]
-        X[i, 3] = (edge_points[i][2])^2
-        X[i, 4] = edge_points[i][1]
-        X[i, 5] = edge_points[i][2]
-        X[i, 6] = 1
+        X[i, 1] = (edge_points[i][1])^2 + (edge_points[i][2]^2)
+        X[i, 2] = edge_points[i][1]
+        X[i, 3] = edge_points[i][2]
+        X[i, 4] = 1
     end
 
     # Use SVD for solving the resulting set of linear equations.
