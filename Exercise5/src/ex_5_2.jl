@@ -31,7 +31,7 @@ function main()
     end
 
     # Use the last params from the iteration to define the function of the line.
-    x = range(0, 100, length=512)
+    x = range(0, 100, length=100)
     y = ((-params[1] / params[2]) * x .+ (- params[3] / params[2]))
     plot!(x, y)
 

@@ -17,6 +17,8 @@ function main()
     #println(x)
     #a = edge_points[6][1]
     #println(size(img))
+
+
     # Exercise part b: Implement SVD
     X = zeros(edgepoints_size, 4)
     #println(edge_points[1][1])
@@ -43,13 +45,12 @@ function main()
         end
     end
 
-    println(rangex)
-    println(rangey)
+    #println(rangex)
+    #println(rangey)
 
     # Use SVD for solving the resulting set of linear equations.
     svd_vals = svd(X)
     V = svd_vals.V
-    #println(V)
 
     # Plot the circle found on the original image.
     #plot(V[:, 4])
@@ -100,7 +101,7 @@ function edge_detection(img)
 
     # Thin the edges.
     binary = thinning(binary_img)
-    edges = plot_image(Gray.(binary), title = "Edges")
+    edges = plot(Gray.(binary), title = "Edges")
     display(edges)
 
     # Make a list of the pixels along the edge.
@@ -109,7 +110,7 @@ function edge_detection(img)
         for j in 1:dimensions[2]
             if (binary[i, j] == 1)
                 push!(list, (i, j))
-                #println(".")
+
             end
         end
     end
