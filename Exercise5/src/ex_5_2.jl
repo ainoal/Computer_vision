@@ -12,7 +12,19 @@ function main()
     #size = size(data)
     #println(size)
     size = 512
-    println(sizeof(points))
+    #println(sizeof(points))
+    print(points[:, 4])
+    points_matrix = []
+    #plot(points[:, 1], seriestype=:scatter)
+    
+    for i in 1:512
+        #points_matrix[i] = (points[1,i], points[2, i])
+        p = plot!(points[:, i], seriestype=:scatter)
+        push!(points_matrix, (points[1, i], points[2, i]))
+    end
+
+
+    #println(points_matrix)
 
     # Gradient descent
     starting_point = [1, 1, 1]
@@ -31,17 +43,19 @@ function main()
         params = prev_params - stepsize * partial_derivative(prev_params, points)
         prev_params = params
     end
-
-    #println(params[3])
+    #println(partial_derivative(prev_params, points))
+    #println(params)
     # Use the last params from the iteration to define the function of the line.
     #f(x, y) = params[1] * x + params[2] * y + params[3]
 
     # This part not working
-    #x = range(0, 512, length=512)
-    #y = ((-params[1] / params[2]) * x + (- params[3] / params[2]))
+    x = range(0, 512, length=512)
+    y = ((-params[1] / params[2]) * x .+ (- params[3] / params[2]))
 
     # Plot the data points and the line in the same plot.
-    #plot(x, y)
+    #plot(points, seriestype=:scatter)
+    #plot!(x, y)
+    display(p)
 
 end
 

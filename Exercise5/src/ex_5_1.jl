@@ -31,16 +31,22 @@ function main()
     # Exercise part c: Limit the number of local features with tresholding.
     t = 0.03
     for level in 1:4
-        channels = channelview(extrema[level])
-        features = abs.(channels[1, :, :]) .> t
+        channels = channelview(extrema[:, :, level])
+        features = abs.(channels) .> t
+        # features = findall(abs.(channels) .> t)
         feature_points = Gray.(features)
-        p = plot!(feature_points)
+        #feature_points = findall(x->x==1, feature_p)
+        #feature_points = findall(features .== true)
+        #features .== true ? feature_points .= 1 : feature_points .= 0
+        #println(feature_points)
+        p = plot(feature_points)
+        display(p)
     end
-    display(p)
+    
 end
 
 function find_extrema(vals)
-    c = centered(vals)[0, 0]
+    c = centered(vals)[0, 0, 0]
     if ((c == maximum(vals)) || (c == minimum(vals)))
         return c
     else

@@ -15,7 +15,7 @@ function main()
     edgepoints_size = 158
     #x = size(getfield.(edge_points, 2))
     #println(x)
-    #a = edge_points[1][6]
+    #a = edge_points[6][1]
 
     # Exercise part b: Implement SVD
     X = zeros(edgepoints_size, 4)
@@ -42,9 +42,15 @@ function main()
     f(x, y) = a * (x^2 + y^2) + b*x + c*y + d
 
     gr()
-    #=contour(
-        f
-    )=#
+    contour(
+        range(edge_points[1][1], edge_points[158][1], 1000),
+        range(edge_points[1][2], edge_points[158][2], 1000),
+        f,
+        color=:red,
+        colorbar=nothing, 
+        linewidth=2,
+        aspect_ratio=:equal
+    )
 end
 
 function edge_detection(img)
