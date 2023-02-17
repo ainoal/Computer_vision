@@ -12,7 +12,7 @@ function main()
 
     size = 512
 
-    print(points[:, 4])
+    #print(points[:, 4])
 
 
     p = plot((points[1, 1], points[2, 1]), seriestype=:scatter)
@@ -49,7 +49,8 @@ function main()
     # This part not working
     x = range(0, 100, length=512)
     y = ((-params[1] / params[2]) * x .+ (- params[3] / params[2]))
-    #plot!(x, y)
+    plot!(x, y)
+
     #plot()
 
     # Plot the data points and the line in the same plot.
@@ -66,6 +67,7 @@ function partial_derivative(prev_params, points)
         gradient[2] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3]) * points[2, i]
         gradient[3] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3])
     end
+    #return gradient
     return normalize(gradient)
 end
 

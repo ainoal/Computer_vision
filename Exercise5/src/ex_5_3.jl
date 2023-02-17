@@ -16,17 +16,35 @@ function main()
     #x = size(getfield.(edge_points, 2))
     #println(x)
     #a = edge_points[6][1]
-
+    #println(size(img))
     # Exercise part b: Implement SVD
     X = zeros(edgepoints_size, 4)
     #println(edge_points[1][1])
+    rangex = [size(img)[1], 0]
+    rangey = [size(img)[2], 0]
     # Construct matrix X that represents the circle.
     for i in 1:edgepoints_size
         X[i, 1] = (edge_points[i][1])^2 + (edge_points[i][2])^2
         X[i, 2] = edge_points[i][1]
         X[i, 3] = edge_points[i][2]
         X[i, 4] = 1
+
+        if (edge_points[i][1] < rangex[1])
+            rangex[1] = edge_points[i][1]
+        end
+        if (edge_points[i][2] < rangey[1])
+            rangey[1] = edge_points[i][2]
+        end
+        if (edge_points[i][1] > rangex[2])
+            rangex[2] = edge_points[i][1]
+        end
+        if (edge_points[i][2] > rangey[2])
+            rangey[2] = edge_points[i][2]
+        end
     end
+
+    println(rangex)
+    println(rangey)
 
     # Use SVD for solving the resulting set of linear equations.
     svd_vals = svd(X)
@@ -43,8 +61,8 @@ function main()
 
     gr()
     contour(
-        range(edge_points[1][1], edge_points[158][1], 1000),
-        range(edge_points[1][2], edge_points[158][2], 1000),
+        range(rangex[1], rangex[2], 1000),
+        range(rangey[1], rangey[2], 1000),
         f,
         color=:red,
         colorbar=nothing, 
