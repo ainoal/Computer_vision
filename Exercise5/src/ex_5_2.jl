@@ -9,19 +9,19 @@ using LinearAlgebra
 function main()
     data = matread(joinpath(@__DIR__, "../data/xy.mat"))
     points = data["xy"] 
-    #size = size(data)
-    #println(size)
-    size = 512
-    #println(sizeof(points))
-    print(points[:, 4])
-    points_matrix = []
-    #plot(points[:, 1], seriestype=:scatter)
 
-    for i in 1:512
-        #points_matrix[i] = (points[1,i], points[2, i])
-        p = plot!(points[:, i], seriestype=:scatter)
-        push!(points_matrix, (points[1, i], points[2, i]))
+    size = 512
+
+    print(points[:, 4])
+
+
+    p = plot((points[1, 1], points[2, 1]), seriestype=:scatter)
+    #for i in 1:512
+    for i in 1:100
+        p = plot!((points[1, i], points[2, i]), seriestype=:scatter)
+
     end
+    #display(p)
 
 
     #println(points_matrix)
@@ -37,8 +37,6 @@ function main()
     params = starting_point
 
     # Code the iteration: 
-
-   # println(points[2, 1])
     for j in 1:iterations
         params = prev_params - stepsize * partial_derivative(prev_params, points)
         prev_params = params
@@ -49,14 +47,14 @@ function main()
     #f(x, y) = params[1] * x + params[2] * y + params[3]
 
     # This part not working
-    x = range(0, 512, length=512)
+    x = range(0, 100, length=512)
     y = ((-params[1] / params[2]) * x .+ (- params[3] / params[2]))
     #plot!(x, y)
     #plot()
 
     # Plot the data points and the line in the same plot.
     #plot(points, seriestype=:scatter)
-    plot!(x, y)
+    #plot!(x, y)
     #display(p)
 
 end

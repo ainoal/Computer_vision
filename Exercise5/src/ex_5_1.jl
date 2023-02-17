@@ -1,3 +1,6 @@
+# Note for self: remember to do local feature extraction also for
+# transformed image + answer the questions
+
 using Images
 using ImageFiltering
 using Plots
