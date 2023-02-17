@@ -16,7 +16,7 @@ function main()
     print(points[:, 4])
     points_matrix = []
     #plot(points[:, 1], seriestype=:scatter)
-    
+
     for i in 1:512
         #points_matrix[i] = (points[1,i], points[2, i])
         p = plot!(points[:, i], seriestype=:scatter)
@@ -51,11 +51,13 @@ function main()
     # This part not working
     x = range(0, 512, length=512)
     y = ((-params[1] / params[2]) * x .+ (- params[3] / params[2]))
+    #plot!(x, y)
+    #plot()
 
     # Plot the data points and the line in the same plot.
     #plot(points, seriestype=:scatter)
-    #plot!(x, y)
-    display(p)
+    plot!(x, y)
+    #display(p)
 
 end
 
