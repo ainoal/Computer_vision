@@ -35,13 +35,22 @@ function main()
         #channels = channelview(extrema[:, :, level])
         features = abs.(extrema[:, :, level]) .> t
         # features = findall(abs.(channels) .> t)
-        feature_points = Gray.(features)
-        
+        feature_p = Gray.(features)
+        # corners = Vector{Tuple{Int64, Int64}}()
+        feature_points = Vector{Tuple{Int64, Int64}}()
+        for k in 1:imgsize[1]
+            for j in 1:imgsize[2]
+                if (feature_p[k, j] == true)
+                    push!(feature_points, (k, j))
+                end
+            end
+        end
+
         #feature_points = findall(x->x==1, feature_p)
         #feature_points = findall(features .== true)
         #features .== true ? feature_points .= 1 : feature_points .= 0
         #println(feature_points)
-        p = plot!(feature_points)
+        p = plot!(feature_points, seriestype=:scatter)
         display(p)
     end
 end
