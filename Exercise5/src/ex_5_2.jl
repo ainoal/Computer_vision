@@ -62,7 +62,7 @@ end
 
 function partial_derivative(prev_params, points)
     gradient = [0.0, 0.0, 0.0]
-    for i in 1:3
+    for i in 1:512
         gradient[1] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3]) * points[1, i]
         gradient[2] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3]) * points[2, i]
         gradient[3] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3])
