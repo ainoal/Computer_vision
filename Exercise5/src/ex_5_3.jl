@@ -10,14 +10,8 @@ function main()
     img = load(joinpath(@__DIR__, "../data/circle.png"))
     edge_points = edge_detection(img)
 
-    # WHAT IS THE BEAUTIFUL WAY TO IMPLEMENT THIS?:
     println(size(edge_points))
     edgepoints_size = 158
-    #x = size(getfield.(edge_points, 2))
-    #println(x)
-    #a = edge_points[6][1]
-    #println(size(img))
-
 
     # Exercise part b: Implement SVD
     X = zeros(edgepoints_size, 4)
@@ -59,12 +53,13 @@ function main()
     c = V[3, 4]
     d = V[4, 4]
     f(x, y) = a * (x^2 + y^2) + b*x + c*y + d
-
-    gr()
+    eps = 0.1
+    
     contour(
-        range(rangex[1], rangex[2], 1000),
+        range(rangex[1]-eps, rangex[2], 1000),
         range(rangey[1], rangey[2], 1000),
         f,
+        levels=0:0,
         color=:red,
         colorbar=nothing, 
         linewidth=2,
