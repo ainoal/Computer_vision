@@ -5,43 +5,48 @@ using ImageEdgeDetection: Percentile
 using LinearAlgebra
 using Random
 
+
+#=plt = plot(p, p_median_i, p_median_ii, p_median_iii; size=(700, 700), layout=@layout [x x; x x]);
+display(plt)=#
+
 function main()
     # Exercise part a: Load the image and perform edge detection.
     img = load(joinpath(@__DIR__, "../data/circle.png"))
     edge_points = edge_detection(img)
     #println(size(edge_points))
     edgepoints_size = 158
+    p1 = plot(img)
 
     # Exercise part b and c: Implement SVD and plot the circle
     # found in the original image.
-    plot_shape(img, edge_points, edgepoints_size, "circle")
+    p2 = plot_shape(img, edge_points, edgepoints_size, "circle")
 
     # Exercise part d: Use the the equation for an ellipse to fitting
     # the circle found in the original image.
-    plot_shape(img, edge_points, edgepoints_size, "ellipse")
+    p3 = plot_shape(img, edge_points, edgepoints_size, "ellipse")
     # The results of fitting an equation of a circle or an ellipse to
     # the found circle are the same because a circle is a special
     # case of an ellipse, so both equations hold true for a circle.
 
     # Exercise part e: Resize the image to half its height and repeat
     # steps a-d.
-    img_resized = restrict(img, 2)
-    #p = plot(img)
-    #display(p)
-    #plot(img_resized)
+    img_resized = restrict(img, 1)
+    p4 = plot(img_resized)
     edge_points_resized = edge_detection(img_resized)
-    println(size(edge_points_resized))
+    #println(size(edge_points_resized))
     edgepoints_size_resized = 126
-    plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "circle")
-    plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "ellipse")
+    p5 = plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "circle")
+    p6 = plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "ellipse")
+    # When trying to use the equation of a circle with the found ellipse,
+    # the plot does not come out correctly, since the ellipse is not actually a circle.
 
+    plt = plot(p1, p2, p3, p4, p5, p6; layout=@layout [x x x; x x x])
 end
 
 # The function detects edges in the input image and returns a list of pixels
 # along the edges.
 function edge_detection(img)
     dimensions = size(img)
-    #dimensions = reverse(dimensions)
     println(dimensions)
 
     # Find gradients G_x and G_y.
@@ -52,19 +57,17 @@ function edge_detection(img)
     grayx = Gx_normalized .|> Gray
     grayy = Gy_normalized .|> Gray
 
-    #println(size(grayy))
-
     t = 0.01
 
-    binary_img = falses(reverse(dimensions))
+    binary_img = falses(dimensions)
 
     # For each pixel, update binary image to represent the edges.
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
             if (t < sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2))
-                binary_img[j, i] = true
+                binary_img[i, j] = true
             else
-                binary_img[j, i] = false
+                binary_img[i, j] = false
             end
         end
     end
@@ -72,14 +75,13 @@ function edge_detection(img)
     # Thin the edges.
     binary = thinning(binary_img)
     edges = plot(Gray.(binary), title = "Edges")
-    display(edges)
 
     # Make a list of the pixels along the edge.
     list = []
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
-            if (binary[j, i] == 1)
-                push!(list, (i, j))
+            if (binary[i, j] == 1)
+                push!(list, (j, i))
 
             end
         end
@@ -174,7 +176,7 @@ function plot_shape(img, edge_points, edgepoints_size, shape)
         )
     end
 
-    display(cont)
+    return cont
 end
 
 plot_image(img; kws...) = 
