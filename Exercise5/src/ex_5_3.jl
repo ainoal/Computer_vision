@@ -19,9 +19,21 @@ function main()
     # Exercise part d: Use the the equation for an ellipse to fitting
     # the circle found in the original image.
     plot_shape(img, edge_points, edgepoints_size, "ellipse")
+    # The results of fitting an equation of a circle or an ellipse to
+    # the found circle are the same because a circle is a special
+    # case of an ellipse, so both equations hold true for a circle.
 
     # Exercise part e: Resize the image to half its height and repeat
     # steps a-d.
+    img_resized = restrict(img, 2)
+    #p = plot(img)
+    #display(p)
+    #plot(img_resized)
+    edge_points_resized = edge_detection(img_resized)
+    println(size(edge_points_resized))
+    edgepoints_size_resized = 126
+    plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "circle")
+    plot_shape(img_resized, edge_points_resized, edgepoints_size_resized, "ellipse")
 
 end
 
@@ -29,6 +41,8 @@ end
 # along the edges.
 function edge_detection(img)
     dimensions = size(img)
+    #dimensions = reverse(dimensions)
+    println(dimensions)
 
     # Find gradients G_x and G_y.
     Gx, Gy = imgradients(img, KernelFactors.sobel)
@@ -38,6 +52,8 @@ function edge_detection(img)
     grayx = Gx_normalized .|> Gray
     grayy = Gy_normalized .|> Gray
 
+    #println(size(grayy))
+
     t = 0.01
 
     binary_img = falses(reverse(dimensions))
@@ -46,9 +62,9 @@ function edge_detection(img)
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
             if (t < sqrt(grayx[i, j] ^ 2 + grayy[i, j] ^ 2))
-                binary_img[i, j] = true
+                binary_img[j, i] = true
             else
-                binary_img[i, j] = false
+                binary_img[j, i] = false
             end
         end
     end
@@ -62,7 +78,7 @@ function edge_detection(img)
     list = []
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
-            if (binary[i, j] == 1)
+            if (binary[j, i] == 1)
                 push!(list, (i, j))
 
             end
@@ -119,7 +135,7 @@ function plot_shape(img, edge_points, edgepoints_size, shape)
     V = svd_vals.V
 
     # Plot the shape found on the image.
-    eps = 0.1
+    eps = 10
 
     if (shape == "circle")
         a = V[1, 4]
@@ -128,8 +144,8 @@ function plot_shape(img, edge_points, edgepoints_size, shape)
         d = V[4, 4]
         f(x, y) = a * (x^2 + y^2) + b*x + c*y + d
         cont = contour(
-            range(rangex[1]-eps, rangex[2], 1000),
-            range(rangey[1], rangey[2], 1000),
+            range(rangex[1]-eps, rangex[2]+eps, 1000),
+            range(rangey[1]-eps, rangey[2]+eps, 1000),
             f,
             levels=0:0,
             color=:red,
@@ -147,8 +163,8 @@ function plot_shape(img, edge_points, edgepoints_size, shape)
         g(x, y) = a*x^2 + b*x*y + c*y^2 + d*x + e*y + f
         cont = contour(
 
-            range(rangex[1]-eps, rangex[2], 1000),
-            range(rangey[1], rangey[2], 1000),
+            range(rangex[1]-eps, rangex[2]+eps, 1000),
+            range(rangey[1]-eps, rangey[2]+eps, 1000),
             g,
             levels=0:0,
             color=:red,
