@@ -1,6 +1,3 @@
-# Note for self: remember to do local feature extraction also for
-# transformed image + answer the questions
-
 using Images
 using ImageFiltering
 using Plots
@@ -9,11 +6,35 @@ function main()
     I = load(joinpath(@__DIR__, "../data/lena_bw.png"))
     p = plot(I)
     I = channelview(I)
-    imgsize = size(I)
 
+    # Exercise parts a-d
+    exercise(I)
+
+    # The features show the locations of edges of features well.
+    # This feature recognition could be improved for example by
+    # grouping points together that belong to the same feature.
+    # If we want to concentrate on features of certain size, we can
+    # only look at the output of some levels of the DoG images. In this
+    # way, if we i.e. want to detect a person's eyes, we will not
+    # find too big features like head or too small features like
+    # a freckle on the face.
+
+    # Exercise part e: repeat (a-d) for transformed image.
+    img = load(joinpath(@__DIR__, "../data/lena_bw_transformed.png"))
+    p = plot(img)
+    img = channelview(img)
+    exercise(img)
+
+    # For the most part, the features recognized in the original and
+    # transformed images are the same. However, in the transformed image,
+    # for example the edges of the image are recognized as features.
+end
+
+function exercise(I)
     # Exercise part a: Construct stack of Gaussians.
     gaussians = Matrix{Float64}[I, I, I, I, I]     # Initialize the array
     sigma = 1.6
+    imgsize = size(I)
 
     for i in 1:5
         gaussians[i] = imfilter(I, Kernel.gaussian(sigma))
@@ -41,7 +62,7 @@ function main()
         for k in 1:imgsize[1]
             for j in 1:imgsize[2]
                 if (feature_p[k, j] == true)
-                    push!(feature_points, (k, j))
+                    push!(feature_points, (j, k))
                 end
             end
         end
