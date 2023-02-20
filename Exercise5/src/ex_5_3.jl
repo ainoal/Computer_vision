@@ -19,6 +19,10 @@ function main()
     # Exercise part d: Use the the equation for an ellipse to fitting
     # the circle found in the original image.
     plot_shape(img, edge_points, edgepoints_size, "ellipse")
+
+    # Exercise part e: Resize the image to half its height and repeat
+    # steps a-d.
+
 end
 
 # The function detects edges in the input image and returns a list of pixels
@@ -134,18 +138,17 @@ function plot_shape(img, edge_points, edgepoints_size, shape)
             aspect_ratio=:equal
         )
     elseif (shape == "ellipse")
-        a = V[1, 4]
-        b = V[2, 4]
-        c = V[3, 4]
-        d = V[4, 4]
-        e = V[5, 4]
-        f = V[6, 4]
+        a = V[1, 6]
+        b = V[2, 6]
+        c = V[3, 6]
+        d = V[4, 6]
+        e = V[5, 6]
+        f = V[6, 6]
         g(x, y) = a*x^2 + b*x*y + c*y^2 + d*x + e*y + f
         cont = contour(
-            # Modifying the range because fitting an ellipse
-            # to the parameters does not work perfectly.
-            range(rangex[1]-100, rangex[2]+100, 1000),
-            range(rangey[1]-100, rangey[2]+100, 1000),
+
+            range(rangex[1]-eps, rangex[2], 1000),
+            range(rangey[1], rangey[2], 1000),
             g,
             levels=0:0,
             color=:red,
