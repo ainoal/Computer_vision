@@ -5,10 +5,6 @@ using ImageEdgeDetection: Percentile
 using LinearAlgebra
 using Random
 
-
-#=plt = plot(p, p_median_i, p_median_ii, p_median_iii; size=(700, 700), layout=@layout [x x; x x]);
-display(plt)=#
-
 function main()
     # Exercise part a: Load the image and perform edge detection.
     img = load(joinpath(@__DIR__, "../data/circle.png"))

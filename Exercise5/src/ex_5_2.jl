@@ -10,7 +10,6 @@ function main()
     size = 512
 
     p = plot((points[1, 1], points[2, 1]), seriestype=:scatter)
-    #for i in 1:512
     for i in 1:100
         p = plot!((points[1, i], points[2, i]), seriestype=:scatter)
 
@@ -45,7 +44,6 @@ function partial_derivative(prev_params, points)
         gradient[3] += 2 * (prev_params[1]*points[1, i] + prev_params[2]*points[2, i] + prev_params[3])
     end
     return gradient
-    #return normalize(gradient)
 end
 
 main()
