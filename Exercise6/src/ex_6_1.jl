@@ -30,7 +30,8 @@ function main()
     M = calibrate(data["points3d"], data["points2d"])
 
     # Exercise part c: project given 3D points using found matrix M.
-    p2d_projected = M * data["points3d"]
+    #d = [data["points3d"][:, 1] 1] --> transposed??
+    p2d_projected = M * [data["points3d"][:, 1] 1]
     #println(data["points3d"][:, 1])
     println(p2d_projected[4, :])
     p2d_projected[1, :] = p2d_projected[1, :] ./ p2d_projected[3, :]
@@ -73,7 +74,7 @@ function calibrate(points3d, points2d)
     svd_vals = svd(A)
     V = svd_vals.V
     # return M = reshape(V[:, end], 3, 4)
-    M = transpose(reshape(V[:, 12], 3, 4))
+    M = transpose(reshape(V[:, 12], 4, 3))
     return M
 end
 
