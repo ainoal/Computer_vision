@@ -47,15 +47,71 @@ function main()
     # Exercise part d: add normalization
     # Construct T, U (lecture slides 23, 24)
     #T = [sqrt(2)/]
-
+    (p2, p3) = normalize(data["points3d"], data["points2d"], 8)
     # p2 = Tp2, p3 = Up3
-    M2 = calibrate(data["points3d"], data["points2d"], true);
+    M2 = calibrate(data["points3d"], data["points2d"]);
 
+    # REMEMBER DENORMALIZATION!
     # M2 = T^-1*M2*U
 end
 
-calibrate(points3d, points2d) = calibrate(points3d, points2d, false)
-function calibrate(points3d, points2d, normalization)
+function normalize(points3d, points2d, N)
+    # Construct T, U (lecture slides 23, 24).
+    # Constructing matrix T for normalization for image (2D) points.
+    sumx = 0
+    sumy = 0
+    sumd = 0
+
+    for i in 1:N
+        sumx += points2d[1, i]
+        sumy += points2d[2, i]
+    end
+    x = (1/N) * sumx
+    y = (1/N) * sumy
+
+    for i in 1:N
+        sumd += sqrt((points2d[1, i] - x)^2 + (points2d[2, i] - y)^2)
+    end
+    d = (1/N) * sumd
+
+    T = [sqrt(2)/d 0 -(sqrt(2))*x/d;
+        0 sqrt(2)/d -(sqrt(2))*y/d;
+        0 0 1]
+
+    # Constructing matrix U for normalization for model (3D) points.
+    sum_X = 0
+    sum_Y = 0
+    sum_Z = 0
+    sum_D = 0
+
+    for i in 1:N
+        sum_X += points3d[1, i]
+        sum_Y += points3d[2, i]
+        sum_Z += points3d[3, i]
+    end
+    X = (1/N) * sum_X
+    Y = (1/N) * sum_Y
+    Z = (1/N) * sum_Z
+
+    for i in 1:N
+        sum_D += sqrt((points3d[1, i] - X)^2 + (points3d[2, i] - Y)^2 +
+            (points3d[3, i] - Z)^2)
+    end
+    D = (1/N) * sum_D
+
+    U = [sqrt(3)/D 0 0 -(sqrt(3))*X/D;
+        0 sqrt(3)/D 0 -(sqrt(3))*Y/D;
+        0 0 sqrt(3)/D -(sqrt(3))*Z/D;
+        0 0 0 1]
+
+    # Normalization using the matrices
+    
+
+    return (0, 1)
+end
+
+#calibrate(points3d, points2d) = calibrate(points3d, points2d, false)
+function calibrate(points3d, points2d)
     # Construct A (slide 19 in lecture slides)
     X = points3d[1, :]
     Y = points3d[2, :]
