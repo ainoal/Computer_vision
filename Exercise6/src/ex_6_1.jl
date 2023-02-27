@@ -48,7 +48,6 @@ function main()
     M2 = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
 
     p2d_proj = M2 * p3_homogeneous
-    #println(p2d_proj)
     p2d_proj[1, :] = p2d_proj[1, :] ./ p2d_proj[3, :]
     p2d_proj[2, :] = p2d_proj[2, :] ./ p2d_proj[3, :]
 

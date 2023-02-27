@@ -9,35 +9,43 @@ function main()
         data = matread(joinpath(@__DIR__, "../data/cube_points.mat"))
         M = calibrate(data["points3d"], data["points2d"])
 
-        (K, R) = decompose_projection(M)
-        #display(K)
-        display(R)
-
-        #R = [R 0; 0; 0; 0 0 1]
-        #og_matrix = K * R * (I)
-        #origin = (K[1, 3], K[2, 3])
-        #display(M[:, 1])
         X = det([M[:, 2] M[:, 3] M[:, 4]])
         Y = -det([M[:, 1] M[:, 3] M[:, 4]])
         Z = det([M[:, 1] M[:, 2] M[:, 4]])
         W = -det([M[:, 1] M[:, 2] M[:, 3]])
 
         C = [X; Y; Z; W]       # camera center
-        println(C)
-        #println(M*C)
-        
-        #matrix = K*[R-R*C]
+        C = [C[1]/C[4]; C[2]/C[4]; C[3]/C[4]]
 
+        I = [1 0 0;
+            0 1 0;
+            0 0 1]
+
+        temp = [1 0 0 -C[1];
+            0 1 0 -C[2];
+            0 0 1 -C[3]]
+
+        KR = M * transpose(temp)
+        (K, R) = decompose_projection(KR)
+
+        #display(K)
+        display(R)
+
+        mat = KR * temp
+        display(mat)
+        display(M)
+
+        #println(R[1, 2])
         plot_frame(data["points3d"], R, C)
 end
 
-function plot_frame(points, R, C)
-    # Normalize C
-    #=C[1] = C[1] / C[4]
-    C[2] = C[2] / C[4]
-    C[3] = C[3] / C[4]=#
+function plot_frame(points, rotation, C)
+    
+    R = [rotation[1, 1] rotation[1, 2] rotation[1, 3] 0;
+        rotation[2, 1] rotation[2, 2] rotation[2, 3] 0;
+        rotation[3, 1] rotation[3, 2] rotation[3, 3] 0;
+        0 0 0 1]
 
-    # The following part needs to be changed for this exercise (?)
     # The length between origin and a point on an axis is one unit
     u = [1; 0; 0; 1];   # point on x axis
     v = [0; 1; 0; 1];   # point on y axis
@@ -50,10 +58,9 @@ function plot_frame(points, R, C)
 
     # Plotting the axes
     plotly()
-    #p = plot(C[1, :], C[2, :], C[3, :], seriestype =:scatter)
     plot(points[1, :], points[2, :], points[3, :], seriestype =:scatter)
     plot!([C[1], u[1]], [C[2], u[2]], [C[3], u[3]],
-        color=RGB(1, 0, 0), length=:0.1, markershape=:none, aspect_ratio=:equal)
+        color=RGB(1, 0, 0), markershape=:none, aspect_ratio=:equal)
     plot!([C[1], v[1]], [C[2], v[2]], [C[3], v[3]], 
         color=RGB(0, 1, 0), markershape=:none, aspect_ratio=:equal)
     p = plot!([C[1], w[1]], [C[2], w[2]], [C[3], w[3]],
@@ -82,7 +89,7 @@ function calibrate(points3d, points2d)
 
     # TODO: make matrix A more beautiful by first initializing an empty matrix
     # and then updating 2 rows at a time inside a for loop
-    #println(x)
+
     A = [X[1] Y[1] Z[1] 1 0 0 0 0 -x[1]*X[1] -x[1]*Y[1] -x[1]*Z[1] -x[1];
         0 0 0 0 X[1] Y[1] Z[1] 1 -y[1]*X[1] -y[1]*Y[1] -y[1]*Z[1] -y[1];
         X[2] Y[2] Z[2] 1 0 0 0 0 -x[2]*X[2] -x[2]*Y[2] -x[2]*Z[2] -x[2];
@@ -103,7 +110,7 @@ function calibrate(points3d, points2d)
     # Use SVD for solving for M
     svd_vals = svd(A)
     V = svd_vals.V
-    # return M = reshape(V[:, end], 3, 4)
+
     M = transpose(reshape(V[:, 12], 4, 3))
     return M
 end
