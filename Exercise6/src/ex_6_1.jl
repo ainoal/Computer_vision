@@ -35,9 +35,8 @@ function main()
     p2d_projected = M * p3_homogeneous
     p2d_projected[1, :] = p2d_projected[1, :] ./ p2d_projected[3, :]
     p2d_projected[2, :] = p2d_projected[2, :] ./ p2d_projected[3, :]
-    plot2d = plot!(p2d_projected[1, :], p2d_projected[2, :], 
+    plot!(p2d_projected[1, :], p2d_projected[2, :], 
         seriestype=:scatter, markershape=:rect, markersize=2)
-    display(plot2d)
 
     # Calculate reprojection error.
     error = reprojection_error(8, data["points2d"], p2d_projected[1:2, :])
@@ -46,28 +45,23 @@ function main()
 
     # Exercise part d: add normalization
     # Construct T, U (lecture slides 23, 24)
-    #T = [sqrt(2)/]
-    #(p2, p3) = normalize(data["points3d"], data["points2d"], 8)
-    # p2 = Tp2, p3 = Up3
     M2 = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
 
     p2d_proj = M2 * p3_homogeneous
+    #println(p2d_proj)
     p2d_proj[1, :] = p2d_proj[1, :] ./ p2d_proj[3, :]
     p2d_proj[2, :] = p2d_proj[2, :] ./ p2d_proj[3, :]
+
+    plot2d = plot!(p2d_projected[1, :], p2d_projected[2, :], 
+        seriestype=:scatter, markershape=:cross, markersize=1)
+    display(plot2d)
 
     error_2 = reprojection_error(8, data["points2d"], p2d_proj[1:2, :])
     print("With normalization, the reprojection error is ")
     println(error_2)
 
-    #=plot2d_normalized = plot!(p2d_proj[1, :], p2d_proj[2, :], 
-        seriestype=:scatter, markershape=:x, markersize=1)
-    display(plot2d_normalized)=#
-
     # Exercise part e: Compare the results with noisy data.
     noisy_data = matread(joinpath(@__DIR__, "../data/cube_points_noisy.mat"))
-
-    #plot_noisy = plot(noisy_data["points3d_noisy"][1, :], noisy_data["points3d_noisy"][2, :],
-    #    noisy_data["points3d_noisy"][3, :], seriestype =:scatter)
 
     plot_noisy = plot(noisy_data["points2d_noisy"][1,:], noisy_data["points2d_noisy"][2,:],
         seriestype=:scatter, aspect_ratio=:equal)
@@ -82,7 +76,7 @@ function main()
     p2d_noisy = M3 * p3_noisy
     p2d_noisy[1, :] = p2d_noisy[1, :] ./ p2d_noisy[3, :]
     p2d_noisy[2, :] = p2d_noisy[2, :] ./ p2d_noisy[3, :]
-    plot2d = plot!(p2d_noisy[1, :], p2d_noisy[2, :], 
+    plot!(p2d_noisy[1, :], p2d_noisy[2, :], 
         seriestype=:scatter, markershape=:rect, markersize=2)
     display(plot_noisy)
 
@@ -96,9 +90,20 @@ function main()
     p2d_proj_noisy[1, :] = p2d_proj_noisy[1, :] ./ p2d_proj_noisy[3, :]
     p2d_proj_noisy[2, :] = p2d_proj_noisy[2, :] ./ p2d_proj_noisy[3, :]
 
+    plot!(p2d_proj_noisy[1, :], p2d_proj_noisy[2, :], 
+        seriestype=:scatter, markershape=:cross, markersize=2)
+    display(plot_noisy)
+
     error_2 = reprojection_error(8, noisy_data["points2d_noisy"], p2d_proj_noisy[1:2, :])
     print("With normalization, the reprojection error with noisy data is ")
     println(error_2)
+
+    # Conclusions: with the first dataset, normalization does not make a
+    # significant difference because the data does not contain oise. However,
+    # real life data usually has some noise. When we compare the projections
+    # of our noisy data with and without normalization, we can see
+    # that with normalization the projections are good, whereas without
+    # they do not produce a satisfactory result (rectangles in the last plot).
 end
 
 function normalize_and_calibrate(points3d, points2d, N)
@@ -160,7 +165,7 @@ function normalize_and_calibrate(points3d, points2d, N)
     p3 = U * p3_homogeneous
 
     # Calibration
-    M2 = calibrate(p2, p3)
+    M2 = calibrate(p3, p2)
 
     # Denormlization
     M = inv(T) * M2 * U
