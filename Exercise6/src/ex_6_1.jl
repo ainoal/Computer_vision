@@ -16,13 +16,12 @@ function main()
     end
     display(plot3d)
 
-    plot2d = plot(data["points2d"][1,:], data["points2d"][2,:],
+    plot(data["points2d"][1,:], data["points2d"][2,:],
         seriestype=:scatter, aspect_ratio=:equal)
     for i in 1:16
         plot!([data["points2d"][1, idx[i]], data["points2d"][1, idx[i+1]]],
             [data["points2d"][2, idx[i]], data["points2d"][2, idx[i+1]]])
     end
-    display(plot2d)
 
     # Exercise part b: implement a function that parforms direct-linear-transformation
     # (DLT) and finds a suitable projection matrix that would project points3d
@@ -31,23 +30,33 @@ function main()
 
     ones = [1 1 1 1 1 1 1 1]
     p3_homogeneous = vcat(data["points3d"], ones)
-    #println(p3_homogeneous)
 
     # Exercise part c: project given 3D points using found matrix M.
-    #d = [data["points3d"][:, 1] 1] --> transposed??
     p2d_projected = M * p3_homogeneous
-    #println(data["points3d"][:, 1])
-    println(p2d_projected[2, :])
     p2d_projected[1, :] = p2d_projected[1, :] ./ p2d_projected[3, :]
     p2d_projected[2, :] = p2d_projected[2, :] ./ p2d_projected[3, :]
-    println(p2d_projected[2, :])
-    #p2d_projected = [p_projected[1]/ p_projected[3]; p_projected[2]/p_projected[3]]
-    #println(p2d_projected[1])
-    plot(p2d_projected[1, :], p2d_projected[2, :], seriestype=:scatter)
+    plot2d = plot!(p2d_projected[1, :], p2d_projected[2, :], 
+        seriestype=:scatter, markershape=:rect, markersize=2)
+    display(plot2d)
+
+    # Calculate reprojection error.
+    error = reprojection_error(8, data["points2d"], p2d_projected[1:2, :])
+    print("The reprojection error is ")
+    println(error)
+
+    # Exercise part d: add normalization
+    # Construct T, U (lecture slides 23, 24)
+    #T = [sqrt(2)/]
+
+    # p2 = Tp2, p3 = Up3
+    M2 = calibrate(data["points3d"], data["points2d"], true);
+
+    # M2 = T^-1*M2*U
 end
 
-function calibrate(points3d, points2d)
-    # Construct A (slide 19)
+calibrate(points3d, points2d) = calibrate(points3d, points2d, false)
+function calibrate(points3d, points2d, normalization)
+    # Construct A (slide 19 in lecture slides)
     X = points3d[1, :]
     Y = points3d[2, :]
     Z = points3d[3, :]
@@ -57,7 +66,6 @@ function calibrate(points3d, points2d)
 
     # TODO: make matrix A more beautiful by first initializing an empty matrix
     # and then updating 2 rows at a time inside a for loop
-    #println(x)
     A = [X[1] Y[1] Z[1] 1 0 0 0 0 -x[1]*X[1] -x[1]*Y[1] -x[1]*Z[1] -x[1];
         0 0 0 0 X[1] Y[1] Z[1] 1 -y[1]*X[1] -y[1]*Y[1] -y[1]*Z[1] -y[1];
         X[2] Y[2] Z[2] 1 0 0 0 0 -x[2]*X[2] -x[2]*Y[2] -x[2]*Z[2] -x[2];
@@ -81,6 +89,15 @@ function calibrate(points3d, points2d)
     # return M = reshape(V[:, end], 3, 4)
     M = transpose(reshape(V[:, 12], 4, 3))
     return M
+end
+
+function reprojection_error(N, points, projected_points)
+    sum = 0
+    for i in 1:N
+        sum += abs(points[i] - projected_points[i])
+    end
+    error = (1/N) * sum
+    return error
 end
 
 main()
