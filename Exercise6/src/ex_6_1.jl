@@ -51,7 +51,7 @@ function main()
     # p2 = Tp2, p3 = Up3
     M2 = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
 
-    p2d_proj = M * p3_homogeneous
+    p2d_proj = M2 * p3_homogeneous
     p2d_proj[1, :] = p2d_proj[1, :] ./ p2d_proj[3, :]
     p2d_proj[2, :] = p2d_proj[2, :] ./ p2d_proj[3, :]
 
@@ -63,7 +63,42 @@ function main()
         seriestype=:scatter, markershape=:x, markersize=1)
     display(plot2d_normalized)=#
 
+    # Exercise part e: Compare the results with noisy data.
+    noisy_data = matread(joinpath(@__DIR__, "../data/cube_points_noisy.mat"))
 
+    #plot_noisy = plot(noisy_data["points3d_noisy"][1, :], noisy_data["points3d_noisy"][2, :],
+    #    noisy_data["points3d_noisy"][3, :], seriestype =:scatter)
+
+    plot_noisy = plot(noisy_data["points2d_noisy"][1,:], noisy_data["points2d_noisy"][2,:],
+        seriestype=:scatter, aspect_ratio=:equal)
+    for i in 1:16
+        plot!([noisy_data["points2d_noisy"][1, idx[i]], noisy_data["points2d_noisy"][1, idx[i+1]]],
+            [noisy_data["points2d_noisy"][2, idx[i]], noisy_data["points2d_noisy"][2, idx[i+1]]])
+    end
+
+    M3 = calibrate(noisy_data["points3d_noisy"], noisy_data["points2d_noisy"])
+    p3_noisy = vcat(noisy_data["points3d_noisy"], ones)
+
+    p2d_noisy = M3 * p3_noisy
+    p2d_noisy[1, :] = p2d_noisy[1, :] ./ p2d_noisy[3, :]
+    p2d_noisy[2, :] = p2d_noisy[2, :] ./ p2d_noisy[3, :]
+    plot2d = plot!(p2d_noisy[1, :], p2d_noisy[2, :], 
+        seriestype=:scatter, markershape=:rect, markersize=2)
+    display(plot_noisy)
+
+    error_noisydata = reprojection_error(8, noisy_data["points2d_noisy"], p2d_noisy[1:2, :])
+    print("The reprojection error with noisy data is ")
+    println(error_noisydata)
+
+    M4 = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
+
+    p2d_proj_noisy = M4 * p3_homogeneous
+    p2d_proj_noisy[1, :] = p2d_proj_noisy[1, :] ./ p2d_proj_noisy[3, :]
+    p2d_proj_noisy[2, :] = p2d_proj_noisy[2, :] ./ p2d_proj_noisy[3, :]
+
+    error_2 = reprojection_error(8, noisy_data["points2d_noisy"], p2d_proj_noisy[1:2, :])
+    print("With normalization, the reprojection error with noisy data is ")
+    println(error_2)
 end
 
 function normalize_and_calibrate(points3d, points2d, N)
