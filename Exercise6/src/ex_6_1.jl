@@ -47,15 +47,26 @@ function main()
     # Exercise part d: add normalization
     # Construct T, U (lecture slides 23, 24)
     #T = [sqrt(2)/]
-    (p2, p3) = normalize(data["points3d"], data["points2d"], 8)
+    #(p2, p3) = normalize(data["points3d"], data["points2d"], 8)
     # p2 = Tp2, p3 = Up3
-    M2 = calibrate(data["points3d"], data["points2d"]);
+    M2 = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
 
-    # REMEMBER DENORMALIZATION!
-    # M2 = T^-1*M2*U
+    p2d_proj = M * p3_homogeneous
+    p2d_proj[1, :] = p2d_proj[1, :] ./ p2d_proj[3, :]
+    p2d_proj[2, :] = p2d_proj[2, :] ./ p2d_proj[3, :]
+
+    error_2 = reprojection_error(8, data["points2d"], p2d_proj[1:2, :])
+    print("With normalization, the reprojection error is ")
+    println(error_2)
+
+    #=plot2d_normalized = plot!(p2d_proj[1, :], p2d_proj[2, :], 
+        seriestype=:scatter, markershape=:x, markersize=1)
+    display(plot2d_normalized)=#
+
+
 end
 
-function normalize(points3d, points2d, N)
+function normalize_and_calibrate(points3d, points2d, N)
     # Construct T, U (lecture slides 23, 24).
     # Constructing matrix T for normalization for image (2D) points.
     sumx = 0
@@ -105,9 +116,21 @@ function normalize(points3d, points2d, N)
         0 0 0 1]
 
     # Normalization using the matrices
-    
+    # p2 = Tp2, p3 = Up3
+    ones = [1 1 1 1 1 1 1 1]
+    p2_homogeneous = vcat(points2d, ones)
+    p3_homogeneous = vcat(points3d, ones)
 
-    return (0, 1)
+    p2 = T * p2_homogeneous
+    p3 = U * p3_homogeneous
+
+    # Calibration
+    M2 = calibrate(p2, p3)
+
+    # Denormlization
+    M = inv(T) * M2 * U
+
+    return M
 end
 
 #calibrate(points3d, points2d) = calibrate(points3d, points2d, false)
