@@ -29,16 +29,21 @@ function main()
     # to points2d. Apply the given function to find projection matrix M.
     M = calibrate(data["points3d"], data["points2d"])
 
+    ones = [1 1 1 1 1 1 1 1]
+    p3_homogeneous = vcat(data["points3d"], ones)
+    #println(p3_homogeneous)
+
     # Exercise part c: project given 3D points using found matrix M.
     #d = [data["points3d"][:, 1] 1] --> transposed??
-    p2d_projected = M * [data["points3d"][:, 1] 1]
+    p2d_projected = M * p3_homogeneous
     #println(data["points3d"][:, 1])
-    println(p2d_projected[4, :])
+    println(p2d_projected[2, :])
     p2d_projected[1, :] = p2d_projected[1, :] ./ p2d_projected[3, :]
     p2d_projected[2, :] = p2d_projected[2, :] ./ p2d_projected[3, :]
+    println(p2d_projected[2, :])
     #p2d_projected = [p_projected[1]/ p_projected[3]; p_projected[2]/p_projected[3]]
     #println(p2d_projected[1])
-    plot(p2d_projected, seriestype=:scatter)
+    plot(p2d_projected[1, :], p2d_projected[2, :], seriestype=:scatter)
 end
 
 function calibrate(points3d, points2d)

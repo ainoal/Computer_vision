@@ -11,7 +11,7 @@ function main()
 
         (K, R) = decompose_projection(M)
         #display(K)
-        #display(R)
+        display(R)
 
         #R = [R 0; 0; 0; 0 0 1]
         #og_matrix = K * R * (I)
@@ -23,11 +23,19 @@ function main()
         W = -det([M[:, 1] M[:, 2] M[:, 3]])
 
         C = [X; Y; Z; W]       # camera center
+        println(C)
+        #println(M*C)
+        
+        #matrix = K*[R-R*C]
 
         plot_frame(data["points3d"], R, C)
 end
 
 function plot_frame(points, R, C)
+    # Normalize C
+    #=C[1] = C[1] / C[4]
+    C[2] = C[2] / C[4]
+    C[3] = C[3] / C[4]=#
 
     # The following part needs to be changed for this exercise (?)
     # The length between origin and a point on an axis is one unit
@@ -42,9 +50,10 @@ function plot_frame(points, R, C)
 
     # Plotting the axes
     plotly()
+    #p = plot(C[1, :], C[2, :], C[3, :], seriestype =:scatter)
     plot(points[1, :], points[2, :], points[3, :], seriestype =:scatter)
     plot!([C[1], u[1]], [C[2], u[2]], [C[3], u[3]],
-        color=RGB(1, 0, 0), markershape=:none, aspect_ratio=:equal)
+        color=RGB(1, 0, 0), length=:0.1, markershape=:none, aspect_ratio=:equal)
     plot!([C[1], v[1]], [C[2], v[2]], [C[3], v[3]], 
         color=RGB(0, 1, 0), markershape=:none, aspect_ratio=:equal)
     p = plot!([C[1], w[1]], [C[2], w[2]], [C[3], w[3]],
