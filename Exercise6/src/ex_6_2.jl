@@ -14,8 +14,9 @@ function main()
         Z = det([M[:, 1] M[:, 2] M[:, 4]])
         W = -det([M[:, 1] M[:, 2] M[:, 3]])
 
-        C = [X; Y; Z; W]       # camera center
-        C = [C[1]/C[4]; C[2]/C[4]; C[3]/C[4]]
+       # C = [X; Y; Z; W]       # camera center
+        #C = [C[1]/C[4]; C[2]/C[4]; C[3]/C[4]]
+        C = [X/W Y/W Z/W]
 
         I = [1 0 0;
             0 1 0;
@@ -31,7 +32,7 @@ function main()
         #display(K)
         display(R)
 
-        mat = KR * temp
+        mat = KR * temp     # Not completely matching with M, why?
         display(mat)
         display(M)
 
@@ -40,7 +41,7 @@ function main()
 end
 
 function plot_frame(points, rotation, C)
-    
+
     R = [rotation[1, 1] rotation[1, 2] rotation[1, 3] 0;
         rotation[2, 1] rotation[2, 2] rotation[2, 3] 0;
         rotation[3, 1] rotation[3, 2] rotation[3, 3] 0;
@@ -51,7 +52,7 @@ function plot_frame(points, rotation, C)
     v = [0; 1; 0; 1];   # point on y axis
     w = [0; 0; 1; 1];   # point on z axis
 
-    # Multiplying the points with the transformation matrix
+    # Transforming the points with the transformation matrix
     u = R * u;
     v = R * v;
     w = R * w;
