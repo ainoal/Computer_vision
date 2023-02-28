@@ -77,7 +77,6 @@ function main()
     p2d_noisy[2, :] = p2d_noisy[2, :] ./ p2d_noisy[3, :]
     plot!(p2d_noisy[1, :], p2d_noisy[2, :], 
         seriestype=:scatter, markershape=:rect, markersize=2)
-    display(plot_noisy)
 
     error_noisydata = reprojection_error(8, noisy_data["points2d_noisy"], p2d_noisy[1:2, :])
     print("The reprojection error with noisy data is ")
@@ -172,7 +171,6 @@ function normalize_and_calibrate(points3d, points2d, N)
     return M
 end
 
-#calibrate(points3d, points2d) = calibrate(points3d, points2d, false)
 function calibrate(points3d, points2d)
     # Construct A (slide 19 in lecture slides)
     X = points3d[1, :]

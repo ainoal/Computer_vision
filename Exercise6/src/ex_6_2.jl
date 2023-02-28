@@ -14,9 +14,7 @@ function main()
         Z = det([M[:, 1] M[:, 2] M[:, 4]])
         W = -det([M[:, 1] M[:, 2] M[:, 3]])
 
-       # C = [X; Y; Z; W]       # camera center
-        #C = [C[1]/C[4]; C[2]/C[4]; C[3]/C[4]]
-        C = [X/W Y/W Z/W]
+        C = [X/W Y/W Z/W]   # Camera center
 
         I = [1 0 0;
             0 1 0;
@@ -29,14 +27,13 @@ function main()
         KR = M * transpose(temp)
         (K, R) = decompose_projection(KR)
 
-        #display(K)
+        display(K)
         display(R)
 
         mat = KR * temp     # Not completely matching with M, why?
-        display(mat)
-        display(M)
+        #display(mat)
+        #display(M)
 
-        #println(R[1, 2])
         plot_frame(data["points3d"], R, C)
 end
 
