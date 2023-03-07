@@ -16,43 +16,47 @@ function main()
 
         C = [X/W Y/W Z/W]   # Camera center
 
-        I = [1 0 0;
-            0 1 0;
-            0 0 1]
-
         temp = [1 0 0 -C[1];
             0 1 0 -C[2];
             0 0 1 -C[3]]
 
-        KR = M * transpose(temp)
-        (K, R) = decompose_projection(KR)
+        #KR = M * transpose(temp)
+        KR = M/temp
+        K, R = decompose_projection(KR)
 
-        display(K)
-        display(R)
+        #display(K)
+        #display(R)
 
-        mat = KR * temp     # Not completely matching with M, why?
+        #mat = KR * temp    # Matches M
         #display(mat)
         #display(M)
+        #=R = [1 0 0;
+            0 1 0;
+            0 0 1]=#
+
+        # R = Matrix{Float64}(I, 3, 3)
 
         plot_frame(data["points3d"], R, C)
 end
 
-function plot_frame(points, rotation, C)
-
-    R = [rotation[1, 1] rotation[1, 2] rotation[1, 3] 0;
-        rotation[2, 1] rotation[2, 2] rotation[2, 3] 0;
-        rotation[3, 1] rotation[3, 2] rotation[3, 3] 0;
+function plot_frame(points, R, C)
+    # Translation is C. Take that into account in the transformation matrix!
+    T = [R[1, 1] R[1, 2] R[1, 3] C[1];
+        R[2, 1] R[2, 2] R[2, 3] C[2];
+        R[3, 1] R[3, 2] R[3, 3] C[3];
         0 0 0 1]
 
+    #o = [0; 0; 0; 1]    # origin of the world coordinate frame
     # The length between origin and a point on an axis is one unit
-    u = [1; 0; 0; 1];   # point on x axis
-    v = [0; 1; 0; 1];   # point on y axis
-    w = [0; 0; 1; 1];   # point on z axis
+    u = [1; 0; 0; 1]   # point on x axis
+    v = [0; 1; 0; 1]   # point on y axis
+    w = [0; 0; 1; 1]   # point on z axis
 
     # Transforming the points with the transformation matrix
-    u = R * u;
-    v = R * v;
-    w = R * w;
+    #o = T * o
+    u = T * u
+    v = T * v
+    w = T * w
 
     # Plotting the axes
     plotly()
@@ -64,6 +68,7 @@ function plot_frame(points, rotation, C)
     p = plot!([C[1], w[1]], [C[2], w[2]], [C[3], w[3]],
         color=RGB(0, 0, 1), markershape=:none, aspect_ratio=:equal)
     display(p)
+
 end
 
 flipud(M) = reverse(M, dims=1)

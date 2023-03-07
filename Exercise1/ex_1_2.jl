@@ -1,9 +1,6 @@
 # Currently only plotting one coordinate frame in one plot
 
 using Pkg
-Pkg.add("LinearAlgebra")
-Pkg.add("DataFrames")
-
 using Plots
 using LinearAlgebra
 using DataFrames
