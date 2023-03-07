@@ -17,15 +17,13 @@ function main()
 
     # Treshold the cubes from the background
     x = get_available_properties()
-    #println(x)
     pieces = locate_colors(img)
     black_pieces= locate_black(img)
     p = plot(img)
 
     # Localize each piece from background. Use the centroid to model
     # the center of mass of each piece.
-    props = regionprops(pieces, :centroid, :indices, :circularity,
-        :minor_axis_length, :major_axis_length, :orientation)
+    props = regionprops(pieces, :centroid, :minor_axis_length, :major_axis_length)
 
     for i in 1:length(props)
         if (props[i].minor_axis_length > 290) && (props[i].minor_axis_length < 291)
@@ -42,8 +40,7 @@ function main()
     end
 
     #black_pieces= locate_black(img)
-    black_props = regionprops(black_pieces, :centroid, :indices, :circularity,
-        :minor_axis_length, :major_axis_length, :orientation)
+    black_props = regionprops(black_pieces, :centroid, :minor_axis_length, :major_axis_length)
     
     for i in 1:length(black_props)
         if (black_props[i].minor_axis_length > 246.8) && (black_props[i].minor_axis_length < 247)
@@ -53,15 +50,15 @@ function main()
         end
     end
 
-    points3d = transpose([red; green; blue; black; red; green; blue; black])
+    points3d = transpose([red; green; blue; black])
 
-    points2d = [red_center[1] green_center[1] blue_center[1] black_center[1] red_center[1] green_center[1] blue_center[1] black_center[1];
-        red_center[2] green_center[2] blue_center[2] black_center[2] red_center[2] green_center[2] blue_center[2] black_center[2]]
+    points2d = [red_center[1] green_center[1] blue_center[1] black_center[1];
+        red_center[2] green_center[2] blue_center[2] black_center[2]]
 
     # Find projection matrix from 3D points to image points (2D).
-    M = normalize_and_calibrate(points3d, points2d, 8)
+    M = normalize_and_calibrate(points3d, points2d, 4)
+    display(M)
     #M = calibrate(points3d, points2d)
-
     # Use the projection matrix to plot world frame origin in the photo.
     o = [0; 0; 0; 1]
 
@@ -69,10 +66,10 @@ function main()
     proj[1, :] = proj[1, :] ./ proj[3, :]
     proj[2, :] = proj[2, :] ./ proj[3, :]
 
-    
-
+    println("...")
     plot!(proj[1, :], proj[2, :], seriestype=:scatter)
 
+    println(".")
     display(p)
 
     # The origin should be plotted at the bottom of the camera, but
@@ -114,8 +111,6 @@ function calibrate(points3d, points2d)
     x = points2d[1, :]
     y = points2d[2, :]
 
-    # TODO: make matrix A more beautiful by first initializing an empty matrix
-    # and then updating 2 rows at a time inside a for loop
     A = [X[1] Y[1] Z[1] 1 0 0 0 0 -x[1]*X[1] -x[1]*Y[1] -x[1]*Z[1] -x[1];
         0 0 0 0 X[1] Y[1] Z[1] 1 -y[1]*X[1] -y[1]*Y[1] -y[1]*Z[1] -y[1];
         X[2] Y[2] Z[2] 1 0 0 0 0 -x[2]*X[2] -x[2]*Y[2] -x[2]*Z[2] -x[2];
@@ -133,11 +128,10 @@ function calibrate(points3d, points2d)
         X[4] Y[4] Z[4] 1 0 0 0 0 -x[4]*X[4] -x[4]*Y[4] -x[4]*Z[4] -x[4];
         0 0 0 0 X[4] Y[4] Z[4] 1 -y[4]*X[4] -y[4]*Y[4] -y[4]*Z[4] -y[4]]
 
-    println(size(A))
+    display(A)
     # Use SVD for solving for M
     svd_vals = svd(A)
     V = svd_vals.V
-    println(size(V))
     M = transpose(reshape(V[:, 12], 4, 3))
     return M
 end
@@ -192,7 +186,7 @@ function normalize_and_calibrate(points3d, points2d, N)
         0 0 0 1]
 
     # Normalization using the matrices
-    ones = [1 1 1 1 1 1 1 1]
+    ones = [1 1 1 1]
     p2_homogeneous = vcat(points2d, ones)
     p3_homogeneous = vcat(points3d, ones)
 
