@@ -32,28 +32,31 @@ end
 
 function plot_frame(points, R, C)
     # Translation is C. Take that into account in the transformation matrix!
-    T = [R[1, 1] R[1, 2] R[1, 3] C[1];
-        R[2, 1] R[2, 2] R[2, 3] C[2];
-        R[3, 1] R[3, 2] R[3, 3] C[3];
+    wTc = [R[1, 1] R[1, 2] R[1, 3] -C[1];
+        R[2, 1] R[2, 2] R[2, 3] -C[2];
+        R[3, 1] R[3, 2] R[3, 3] -C[3];
         0 0 0 1]
 
+    o = [0; 0; 0; 1]    # origin of the reference coordinate frame
     # The length between origin and a point on an axis is one unit
     u = [1; 0; 0; 1]   # point on x axis
     v = [0; 1; 0; 1]   # point on y axis
     w = [0; 0; 1; 1]   # point on z axis
 
     # Transforming the points with the transformation matrix
-    u = T * u
-    v = T * v
-    w = T * w
+    u = wTc * u
+    v = wTc * v
+    w = wTc * w
+
+    o = wTc * o
 
     # Plotting the axes
     plot(points[1, :], points[2, :], points[3, :], seriestype =:scatter)
-    plot!([C[1], u[1]], [C[2], u[2]], [C[3], u[3]],
+    plot!([o[1], u[1]], [o[2], u[2]], [o[3], u[3]],
         color=RGB(1, 0, 0), markershape=:none, aspect_ratio=:equal)
-    plot!([C[1], v[1]], [C[2], v[2]], [C[3], v[3]], 
+    plot!([o[1], v[1]], [o[2], v[2]], [o[3], v[3]], 
         color=RGB(0, 1, 0), markershape=:none, aspect_ratio=:equal)
-    p = plot!([C[1], w[1]], [C[2], w[2]], [C[3], w[3]],
+    p = plot!([o[1], w[1]], [o[2], w[2]], [o[3], w[3]],
         color=RGB(0, 0, 1), markershape=:none, aspect_ratio=:equal)
     display(p)
 

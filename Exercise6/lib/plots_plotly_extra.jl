@@ -392,7 +392,7 @@ function Plots.axis_limits(
         letter in (:x, :y) &&
         !(aspect_ratio === :none || Plots.RecipesPipeline.is3d(sp))
     )
-        println("Not equal")
+        #println("Not equal")
         aspect_ratio = aspect_ratio isa Number ? aspect_ratio : 1
         area = Plots.plotarea(sp)
         plot_ratio = Plots.height(area) / Plots.width(area)
