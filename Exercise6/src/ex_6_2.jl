@@ -4,10 +4,12 @@ using MAT
 using Plots
 using LinearAlgebra
 using Random
+plotlyjs()
+include(joinpath(@__DIR__, "../lib/plots_plotly_extra.jl"))
 
 function main()
         data = matread(joinpath(@__DIR__, "../data/cube_points.mat"))
-        M = calibrate(data["points3d"], data["points2d"])
+        M = normalize_and_calibrate(data["points3d"], data["points2d"], 8)
 
         X = det([M[:, 2] M[:, 3] M[:, 4]])
         Y = -det([M[:, 1] M[:, 3] M[:, 4]])
@@ -20,23 +22,11 @@ function main()
             0 1 0 -C[2];
             0 0 1 -C[3]]
 
-        #KR = M * transpose(temp)
         KR = M/temp
         K, R = decompose_projection(KR)
 
-        #display(K)
-        #display(R)
-
-        #mat = KR * temp    # Matches M
-        #display(mat)
-        #display(M)
-        #=R = [1 0 0;
-            0 1 0;
-            0 0 1]=#
-
-        # R = Matrix{Float64}(I, 3, 3)
-
         plot_frame(data["points3d"], R, C)
+
 end
 
 function plot_frame(points, R, C)
@@ -46,20 +36,17 @@ function plot_frame(points, R, C)
         R[3, 1] R[3, 2] R[3, 3] C[3];
         0 0 0 1]
 
-    #o = [0; 0; 0; 1]    # origin of the world coordinate frame
     # The length between origin and a point on an axis is one unit
     u = [1; 0; 0; 1]   # point on x axis
     v = [0; 1; 0; 1]   # point on y axis
     w = [0; 0; 1; 1]   # point on z axis
 
     # Transforming the points with the transformation matrix
-    #o = T * o
     u = T * u
     v = T * v
     w = T * w
 
     # Plotting the axes
-    plotly()
     plot(points[1, :], points[2, :], points[3, :], seriestype =:scatter)
     plot!([C[1], u[1]], [C[2], u[2]], [C[3], u[3]],
         color=RGB(1, 0, 0), markershape=:none, aspect_ratio=:equal)
@@ -78,6 +65,74 @@ function decompose_projection(M)
     R = R0 |> transpose |> reverse
     Q = Q0 |> transpose |> flipud
     return (R, Q)
+end
+
+# Function used in exercise 6.1 to find matrix M. (The function is used for normalization)
+function normalize_and_calibrate(points3d, points2d, N)
+    # Construct T, U (lecture slides 23, 24).
+    # Constructing matrix T for normalization for image (2D) points.
+    sumx = 0
+    sumy = 0
+    sumd = 0
+
+    for i in 1:N
+        sumx += points2d[1, i]
+        sumy += points2d[2, i]
+    end
+    x = (1/N) * sumx
+    y = (1/N) * sumy
+
+    for i in 1:N
+        sumd += sqrt((points2d[1, i] - x)^2 + (points2d[2, i] - y)^2)
+    end
+    d = (1/N) * sumd
+
+    T = [sqrt(2)/d 0 -(sqrt(2))*x/d;
+        0 sqrt(2)/d -(sqrt(2))*y/d;
+        0 0 1]
+
+    # Constructing matrix U for normalization for model (3D) points.
+    sum_X = 0
+    sum_Y = 0
+    sum_Z = 0
+    sum_D = 0
+
+    for i in 1:N
+        sum_X += points3d[1, i]
+        sum_Y += points3d[2, i]
+        sum_Z += points3d[3, i]
+    end
+    X = (1/N) * sum_X
+    Y = (1/N) * sum_Y
+    Z = (1/N) * sum_Z
+
+    for i in 1:N
+        sum_D += sqrt((points3d[1, i] - X)^2 + (points3d[2, i] - Y)^2 +
+            (points3d[3, i] - Z)^2)
+    end
+    D = (1/N) * sum_D
+
+    U = [sqrt(3)/D 0 0 -(sqrt(3))*X/D;
+        0 sqrt(3)/D 0 -(sqrt(3))*Y/D;
+        0 0 sqrt(3)/D -(sqrt(3))*Z/D;
+        0 0 0 1]
+
+    # Normalization using the matrices
+    # p2 = Tp2, p3 = Up3
+    ones = [1 1 1 1 1 1 1 1]
+    p2_homogeneous = vcat(points2d, ones)
+    p3_homogeneous = vcat(points3d, ones)
+
+    p2 = T * p2_homogeneous
+    p3 = U * p3_homogeneous
+
+    # Calibration
+    M2 = calibrate(p3, p2)
+
+    # Denormlization
+    M = inv(T) * M2 * U
+
+    return M
 end
 
 # Function used in exercise 6.1 to find matrix M

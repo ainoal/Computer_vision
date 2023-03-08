@@ -19,7 +19,7 @@ function main()
     x = get_available_properties()
     pieces = locate_colors(img)
     black_pieces= locate_black(img)
-    p = plot(img)
+    plot(img)
 
     # Localize each piece from background. Use the centroid to model
     # the center of mass of each piece.
@@ -67,7 +67,7 @@ function main()
     proj[2, :] = proj[2, :] ./ proj[3, :]
 
     println("...")
-    plot!(proj[1, :], proj[2, :], seriestype=:scatter)
+    p = plot!(proj[1, :], proj[2, :], seriestype=:scatter)
 
     println(".")
     display(p)
