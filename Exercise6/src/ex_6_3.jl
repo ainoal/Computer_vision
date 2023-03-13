@@ -98,9 +98,12 @@ function main()
         R[3, 1] R[3, 2] R[3, 3] -C[3];
         0 0 0 1]
 
-    
+    # There is a problem in the matrix M decomposition, due to which this
+    # wTc matrix cannot be used. This is propably caused by using
+    # the same 4 data points twice to construct matrix M.
     display(wTc)
-    #plot_frames(wTc)
+
+    #plot_frames(wTc)   # How world and camera frames would be plotted
 end
 
 # Locate the red, green and blue parts in RGB color space.
@@ -177,8 +180,8 @@ function plot_frames(T)
     p = plot!([o2[1], w2[1]], [o2[2], w2[2]], [o2[3], w2[3]],
         color=RGB(0, 0, 1), markershape=:none, aspect_ratio=:equal)
 
-    #annotate!(u[1], u[2], u[3], "World frame")
-    #annotate!(u2[1], u2[2], u2[3], "Camera frame")
+    annotate!(u[1], u[2], u[3], "World frame")
+    annotate!(u2[1], u2[2], u2[3], "Camera frame")
 
     display(p)
 end
