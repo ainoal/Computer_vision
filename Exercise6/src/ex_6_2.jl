@@ -51,7 +51,7 @@ function plot_frame(points, R, C)
     o = wTc * o
 
     # Plotting the axes
-    plot(points[1, :], points[2, :], points[3, :], seriestype =:scatter)
+    plot(points[1, :], points[2, :], points[3, :], seriestype=:scatter)
     plot!([o[1], u[1]], [o[2], u[2]], [o[3], u[3]],
         color=RGB(1, 0, 0), markershape=:none, aspect_ratio=:equal)
     plot!([o[1], v[1]], [o[2], v[2]], [o[3], v[3]], 
