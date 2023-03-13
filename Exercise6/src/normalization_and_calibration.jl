@@ -2,6 +2,8 @@
 # to a 2D plane. These functions are used in all of this week's
 # exercises.
 
+using LinearAlgebra
+
 function normalize_and_calibrate(points3d, points2d, N)
     # Construct T, U (lecture slides 23, 24).
     # Constructing matrix T for normalization for image (2D) points.
@@ -100,7 +102,6 @@ function calibrate(points3d, points2d)
     # Use SVD for solving for M
     svd_vals = svd(A)
     V = svd_vals.V
-    # return M = reshape(V[:, end], 3, 4)
     M = transpose(reshape(V[:, 12], 4, 3))
     return M
 end
