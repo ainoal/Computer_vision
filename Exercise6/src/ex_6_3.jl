@@ -21,6 +21,7 @@ function main()
     x = get_available_properties()
     pieces = locate_colors(img)
     black_pieces = locate_black(img)
+    gr()        # Use gr backend instead of plotly for images (plotly can be slow)
     p = plot(img)
 
     # Localize each piece from background
