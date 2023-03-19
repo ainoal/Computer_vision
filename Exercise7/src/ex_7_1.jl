@@ -13,7 +13,7 @@ function main()
     pix_size = 7.4 * 10^-6
     FOV_degrees = 66.15
     f_pix = 491.35
-    w = pix_size * 640
+    half_width = pix_size * 640 / 2
 
 
     # The cameras have parallel optical axes and same focal length f.
@@ -33,24 +33,24 @@ function main()
     display(p2)
 
 
-    x_R_red = pix_size * 312 - w/2 + T
-    x_L_red = pix_size * 378 - w/2
+    x_R_red = half_width - pix_size * 312
+    x_L_red = half_width - pix_size * 378
 
-    x_R_blue = pix_size * 182 - w/2 + T
-    x_L_blue = pix_size * 213 - w/2
+    x_R_blue = half_width - pix_size * 182
+    x_L_blue = half_width - pix_size * 213
 
-    x_R_green = pix_size * 374 - w/2 + T
-    x_L_green = pix_size * 395 - w/2
+    x_R_green = half_width - pix_size * 374
+    x_L_green = half_width - pix_size * 395
 
-    calc_distance("red", x_L_red, x_R_red, f_pix, T)
-    calc_distance("blue", x_L_blue, x_R_blue, f_pix, T)
-    calc_distance("green", x_L_green, x_R_green, f_pix, T)
+    calc_distance("red", x_L_red, x_R_red, f_m, T)
+    calc_distance("blue", x_L_blue, x_R_blue, f_m, T)
+    calc_distance("green", x_L_green, x_R_green, f_m, T)
 end
 
 function calc_distance(color, x_L, x_R, f, T)
     d = x_R - x_L
     Z = f * T / d
-    println("The ", color, " cube is ", round(Z; digits=5), " m away from the camera.")
+    println("The ", color, " cube is ", round(Z; digits=2), " m away from the camera.")
 end
 
 main()
