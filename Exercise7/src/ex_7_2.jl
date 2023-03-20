@@ -1,5 +1,6 @@
 using Images
 using Plots
+using LinearAlgebra
 
 function main()
     left_img = load(joinpath(@__DIR__, "../data/books1.jpg"))
@@ -42,16 +43,25 @@ function main()
     T_L = get_normalization_matrix(points_left_img, 8)
     T_R = get_normalization_matrix(points_right_img, 8)
 
+    left_homogeneous = vcat(points_right_img, ones(1, 8))
+    right_homogeneous = vcat(points_left_img, ones(1, 8))
+    left_normalized = T_L * left_homogeneous
+    right_normalized = T_R * right_homogeneous
+
     # TODO:  Determine the fundamental matrix Fˆ from the singular vector corresponding to
     # smallest singular value of Aˆ.
+    A_hat = get_matrix_A(left_normalized, right_normalized)
+    #display(A_hat)
+    svd_vals = svd(A_hat)
+    F_hat = svd_vals.V
+    #F_hat = V[:, end]
+    #F_hat = transpose(reshape(V[:, end], 4, 3))
 
     # TODO: Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
     # has the smallest singular value set equal to zero.
 
     # TODO: Denormalize. See exercises week 6.
 end
-
-
 
 function get_normalization_matrix(points2d, N)
     # Construct T (lecture slides 23, 24 last week).
@@ -77,6 +87,20 @@ function get_normalization_matrix(points2d, N)
         0 0 1]
 
     return T
+end
+
+function get_matrix_A(left, right)
+    Xr = right[1, :]
+    Yr = right[2, :]
+    Xl = left[1, :]
+    Yl = left[2, :]
+
+    A = [Xr[1]*Xl[1] Xr[1]*Yl[1] Xr[1] Yr[1]*Xl[1] Yr[1]*Yl[1] Yr[1] Xl[1] Yl[1] 1]
+    for n in 2:8
+        row = [Xr[n]*Xl[n] Xr[n]*Yl[n] Xr[n] Yr[n]*Xl[n] Yr[n]*Yl[n] Yr[n] Xl[n] Yl[n] 1]
+        A = vcat(A, row)
+    end
+    return A
 end
 
 main()
