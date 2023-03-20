@@ -11,7 +11,7 @@ function main()
     # right image.
 
     p2 = plot(left_img)
-    plot!([220], [7], seriestype=:scatter, markersize=:2)
+    plot!([223], [6], seriestype=:scatter, markersize=:2)
     plot!([185], [52], seriestype=:scatter, markersize=:2)
     plot!([90], [200], seriestype=:scatter, markersize=:2)
     plot!([117], [150], seriestype=:scatter, markersize=:2)
@@ -52,8 +52,33 @@ function main()
     # smallest singular value of Aˆ.
     A_hat = get_matrix_A(left_normalized, right_normalized)
     #display(A_hat)
-    svd_vals = svd(A_hat)
-    F_hat = svd_vals.V
+    #F_hat = svd(A_hat) ? wrong?
+
+    svd_A = svd(A_hat)
+    V = svd_A.V
+    F_hat = (reshape(V[:, end], 3, 3))
+    #display(F_hat)
+    svd_F = svd(F_hat)
+    
+    D_corrected = svd_F.V
+    #display(D_corrected)
+    #println(D_corrected[end, end])
+    #D_corrected[end, end] = 0
+
+    #display(svd_F.U)
+    #display(D_corrected)
+    #display(svd_F.Vt)
+    F_normalized = svd_F.U * Diagonal(svd_F.S) * svd_F.Vt #<- Just testing
+    #F_normalized = svd_F.U * D_corrected * svd_F.Vt
+    F = transpose(T_R) * F_normalized * T_L
+
+    #println(T_R)
+    #println(right_homogeneous[:, end])
+    test = transpose(right_homogeneous[:, end]) * F * left_homogeneous[:, end]
+    #A = A_hat
+    #A[]
+    #F_normalized = 
+
     #F_hat = V[:, end]
     #F_hat = transpose(reshape(V[:, end], 4, 3))
 
