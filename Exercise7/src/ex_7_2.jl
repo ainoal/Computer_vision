@@ -13,31 +13,31 @@ function main()
     p2 = plot(left_img)
     plot!([223], [6], seriestype=:scatter, markersize=:2)
     plot!([185], [52], seriestype=:scatter, markersize=:2)
-    plot!([90], [200], seriestype=:scatter, markersize=:2)
+    plot!([88], [200], seriestype=:scatter, markersize=:2)
     plot!([117], [150], seriestype=:scatter, markersize=:2)
-    plot!([68], [227], seriestype=:scatter, markersize=:2)
-    plot!([103], [60], seriestype=:scatter, markersize=:2)
+    plot!([68], [228], seriestype=:scatter, markersize=:2)
+    plot!([102], [57], seriestype=:scatter, markersize=:2)
     plot!([148], [152], seriestype=:scatter, markersize=:2)
-    plot!([30], [170], seriestype=:scatter, markersize=:2)
-    plot!([250], [200], seriestype=:scatter, markersize=:2)
+    plot!([28], [171], seriestype=:scatter, markersize=:2)
+    plot!([249], [203], seriestype=:scatter, markersize=:2)
     display(p2)
 
     p1 = plot(right_img)
-    plot!([250], [15], seriestype=:scatter, markersize=:2)
-    plot!([200], [50], seriestype=:scatter, markersize=:2)
-    plot!([38], [155], seriestype=:scatter, markersize=:2)
-    plot!([98], [120], seriestype=:scatter, markersize=:2)
+    plot!([247], [14], seriestype=:scatter, markersize=:2)
+    plot!([198], [50], seriestype=:scatter, markersize=:2)
+    plot!([36], [157], seriestype=:scatter, markersize=:2)
+    plot!([98], [123], seriestype=:scatter, markersize=:2)
     plot!([28], [177], seriestype=:scatter, markersize=:2)
-    plot!([120], [28], seriestype=:scatter, markersize=:2)
+    plot!([120], [27], seriestype=:scatter, markersize=:2)
     plot!([118], [138], seriestype=:scatter, markersize=:2)
-    plot!([13], [110], seriestype=:scatter, markersize=:2)
-    plot!([160], [225], seriestype=:scatter, markersize=:2)
+    plot!([13], [111], seriestype=:scatter, markersize=:2)
+    plot!([156], [222], seriestype=:scatter, markersize=:2)
     display(p1)
     
-    points_left_img = transpose([220 7; 185 52; 90 200; 117 150; 68 227;
-        103 60; 148 152; 30 170])
-    points_right_img = transpose([250 15; 200 50; 38 155; 98 120; 28 177;
-        120 28; 118 138; 13 110])
+    points_left_img = transpose([223 6; 185 52; 88 200; 117 150; 68 228;
+        102 57; 148 152; 28 171])
+    points_right_img = transpose([247 14; 198 50; 36 157; 98 123; 28 177;
+        120 27; 118 138; 13 111])
 
     # TODO: Transform to normalized image coordinates.
     T_L = get_normalization_matrix(points_left_img, 8)
@@ -51,41 +51,25 @@ function main()
     # TODO:  Determine the fundamental matrix Fˆ from the singular vector corresponding to
     # smallest singular value of Aˆ.
     A_hat = get_matrix_A(left_normalized, right_normalized)
-    #display(A_hat)
-    #F_hat = svd(A_hat) ? wrong?
-
     svd_A = svd(A_hat)
     V = svd_A.V
     F_hat = (reshape(V[:, end], 3, 3))
-    #display(F_hat)
     svd_F = svd(F_hat)
     
-    D_corrected = svd_F.V
-    #display(D_corrected)
-    #println(D_corrected[end, end])
-    #D_corrected[end, end] = 0
-
-    #display(svd_F.U)
-    #display(D_corrected)
-    #display(svd_F.Vt)
-    F_normalized = svd_F.U * Diagonal(svd_F.S) * svd_F.Vt #<- Just testing
-    #F_normalized = svd_F.U * D_corrected * svd_F.Vt
-    F = transpose(T_R) * F_normalized * T_L
-
-    #println(T_R)
-    #println(right_homogeneous[:, end])
-    test = transpose(right_homogeneous[:, end]) * F * left_homogeneous[:, end]
-    #A = A_hat
-    #A[]
-    #F_normalized = 
-
-    #F_hat = V[:, end]
-    #F_hat = transpose(reshape(V[:, end], 4, 3))
-
     # TODO: Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
     # has the smallest singular value set equal to zero.
+    D_corrected = Diagonal(svd_F.S)
+    F_normalized = svd_F.U * D_corrected * svd_F.Vt
 
     # TODO: Denormalize. See exercises week 6.
+    F = transpose(T_R) * F_normalized * T_L
+
+    # Test with a ninth coordinate pair if F works.
+    ninth_coord_left = [249; 203; 1]
+    ninth_coord_right = [156; 222; 1]
+    test = transpose(ninth_coord_right) * F * ninth_coord_left
+    println(test)
+
 end
 
 function get_normalization_matrix(points2d, N)
