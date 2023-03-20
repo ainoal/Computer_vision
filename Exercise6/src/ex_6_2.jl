@@ -32,9 +32,9 @@ end
 
 function plot_frame(points, R, C)
     # Translation is C. Take that into account in the transformation matrix!
-    wTc = [R[1, 1] R[1, 2] R[1, 3] -C[1];
-        R[2, 1] R[2, 2] R[2, 3] -C[2];
-        R[3, 1] R[3, 2] R[3, 3] -C[3];
+    wTc = [R[1, 1] R[2, 1] R[3, 1] -C[1];
+        R[1, 2] R[2, 2] R[3, 2] -C[2];
+        R[1, 3] R[2, 3] R[3, 3] -C[3];
         0 0 0 1]
 
     o = [0; 0; 0; 1]    # origin of the reference coordinate frame
