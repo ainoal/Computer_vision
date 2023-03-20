@@ -19,7 +19,7 @@ function main()
     # The cameras have parallel optical axes and same focal length f.
     # Use the simple example from lecture slides.
 
-    # Manually choose points from the images.
+    # Manually choose points from the images. Plot the points.
     p1 = plot(right_img)
     plot!([312], [332], seriestype=:scatter, markersize=:2)    # X_R = 312
     plot!([182], [133], seriestype=:scatter, markersize=:1)
@@ -31,7 +31,6 @@ function main()
     plot!([213], [133], seriestype=:scatter, markersize=:1)
     plot!([395], [80], seriestype=:scatter, markersize=:2)
     display(p2)
-
 
     x_R_red = half_width - pix_size * 312
     x_L_red = half_width - pix_size * 378
