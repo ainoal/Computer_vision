@@ -65,7 +65,7 @@ function normalize_and_calibrate(points3d, points2d, N)
     # Calibration
     M2 = calibrate(p3, p2)
 
-    # Denormlization
+    # Denormalization
     M = inv(T) * M2 * U
 
     return M

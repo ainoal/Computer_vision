@@ -2,14 +2,13 @@ using Images
 using Plots
 using LinearAlgebra
 
-function main()
+function get_fundamental_matrix()
     left_img = load(joinpath(@__DIR__, "../data/books1.jpg"))
     right_img = load(joinpath(@__DIR__, "../data/books2.jpg"))
 
-    # print(size(left_img)) # (230, 306)
-    # TODO: Choose 8(+) image coordinates, the same ones from left and 
+    # Size of the images: (230, 306)
+    # Choose 8(+) image coordinates, the same ones from left and 
     # right image.
-
     p2 = plot(left_img)
     plot!([223], [6], seriestype=:scatter, markersize=:2)
     plot!([185], [52], seriestype=:scatter, markersize=:2)
@@ -39,7 +38,7 @@ function main()
     points_right_img = transpose([247 14; 198 50; 36 157; 98 123; 28 177;
         120 27; 118 138; 13 111])
 
-    # TODO: Transform to normalized image coordinates.
+    # Transform to normalized image coordinates.
     T_L = get_normalization_matrix(points_left_img, 8)
     T_R = get_normalization_matrix(points_right_img, 8)
 
@@ -48,7 +47,7 @@ function main()
     left_normalized = T_L * left_homogeneous
     right_normalized = T_R * right_homogeneous
 
-    # TODO:  Determine the fundamental matrix Fˆ from the singular vector corresponding to
+    # Determine the fundamental matrix Fˆ from the singular vector corresponding to
     # smallest singular value of Aˆ.
     A_hat = get_matrix_A(left_normalized, right_normalized)
     svd_A = svd(A_hat)
@@ -56,12 +55,12 @@ function main()
     F_hat = (reshape(V[:, end], 3, 3))
     svd_F = svd(F_hat)
     
-    # TODO: Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
+    # Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
     # has the smallest singular value set equal to zero.
     D_corrected = Diagonal(svd_F.S)
     F_normalized = svd_F.U * D_corrected * svd_F.Vt
 
-    # TODO: Denormalize. See exercises week 6.
+    # Denormalize. See exercises week 6.
     F = transpose(T_R) * F_normalized * T_L
 
     # Test with a ninth coordinate pair if F works.
@@ -70,6 +69,7 @@ function main()
     test = transpose(ninth_coord_right) * F * ninth_coord_left
     println(test)
 
+    return F
 end
 
 function get_normalization_matrix(points2d, N)
@@ -112,4 +112,4 @@ function get_matrix_A(left, right)
     return A
 end
 
-main()
+get_fundamental_matrix()
