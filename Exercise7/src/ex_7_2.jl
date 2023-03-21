@@ -9,7 +9,7 @@ function get_fundamental_matrix()
     # Size of the images: (230, 306)
     # Choose 8(+) image coordinates, the same ones from left and 
     # right image.
-    p2 = plot(left_img)
+    p1 = plot(left_img)
     plot!([223], [6], seriestype=:scatter, markersize=:2)
     plot!([185], [52], seriestype=:scatter, markersize=:2)
     plot!([88], [200], seriestype=:scatter, markersize=:2)
@@ -19,24 +19,24 @@ function get_fundamental_matrix()
     plot!([148], [152], seriestype=:scatter, markersize=:2)
     plot!([28], [171], seriestype=:scatter, markersize=:2)
     plot!([249], [203], seriestype=:scatter, markersize=:2)
-    display(p2)
+    display(p1)
 
-    p1 = plot(right_img)
+    p2 = plot(right_img)
     plot!([247], [14], seriestype=:scatter, markersize=:2)
     plot!([198], [50], seriestype=:scatter, markersize=:2)
     plot!([36], [157], seriestype=:scatter, markersize=:2)
     plot!([98], [123], seriestype=:scatter, markersize=:2)
     plot!([28], [177], seriestype=:scatter, markersize=:2)
     plot!([120], [27], seriestype=:scatter, markersize=:2)
-    plot!([118], [138], seriestype=:scatter, markersize=:2)
+    plot!([119], [137], seriestype=:scatter, markersize=:2)
     plot!([13], [111], seriestype=:scatter, markersize=:2)
     plot!([156], [222], seriestype=:scatter, markersize=:2)
-    display(p1)
+    display(p2)
     
     points_left_img = transpose([223 6; 185 52; 88 200; 117 150; 68 228;
         102 57; 148 152; 28 171])
     points_right_img = transpose([247 14; 198 50; 36 157; 98 123; 28 177;
-        120 27; 118 138; 13 111])
+        120 27; 117 137; 13 111])
 
     # Transform to normalized image coordinates.
     T_L = get_normalization_matrix(points_left_img, 8)
@@ -52,7 +52,7 @@ function get_fundamental_matrix()
     A_hat = get_matrix_A(left_normalized, right_normalized)
     svd_A = svd(A_hat)
     V = svd_A.V
-    F_hat = (reshape(V[:, end], 3, 3))
+    F_hat = reshape(V[:, end], 3, 3)
     svd_F = svd(F_hat)
     
     # Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'

@@ -2,8 +2,6 @@
 
 using Images
 using Plots
-#using Unitful
-#using Unitful.DefaultSymbols: mm, µm, m
 
 function main()
     right_img = load(joinpath(@__DIR__, "../data/Right_image.png"))
