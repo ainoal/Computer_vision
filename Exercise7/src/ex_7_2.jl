@@ -52,7 +52,7 @@ function get_fundamental_matrix()
     A_hat = get_matrix_A(left_normalized, right_normalized)
     svd_A = svd(A_hat)
     V = svd_A.V
-    F_hat = reshape(V[:, end], 3, 3)
+    F_hat = transpose(reshape(V[:, end], 3, 3))
     svd_F = svd(F_hat)
     
     # Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
