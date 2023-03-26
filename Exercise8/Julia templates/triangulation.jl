@@ -3,36 +3,36 @@ include("utils.jl")
 
 function find_fundamental_matrix(pl, pr)
     # TODO Fill in your code for finding fundamental matrix F
-        # Transform to normalized image coordinates.
-        T_L = get_normalization_matrix(pl[:, 1:8], 8)
-        T_R = get_normalization_matrix(pr[:, 1:8], 8)
+    # Transform to normalized image coordinates.
+    T_L = get_normalization_matrix(pl[:, 1:8], 8)
+    T_R = get_normalization_matrix(pr[:, 1:8], 8)
+
+    left_homogeneous = vcat(pl[:, 1:8], ones(1, 8))
+    right_homogeneous = vcat(pr[:, 1:8], ones(1, 8))
+    left_normalized = T_L * left_homogeneous
+    right_normalized = T_R * right_homogeneous
+
+    # Determine the fundamental matrix Fˆ from the singular vector corresponding to
+    # smallest singular value of Aˆ.
+    A_hat = get_matrix_A(left_normalized, right_normalized)
+    svd_A = svd(A_hat)
+    V = svd_A.V
+    F_hat = transpose(reshape(V[:, end], 3, 3))
+    svd_F = svd(F_hat)
     
-        left_homogeneous = vcat(pl[:, 1:8], ones(1, 8))
-        right_homogeneous = vcat(pr[:, 1:8], ones(1, 8))
-        left_normalized = T_L * left_homogeneous
-        right_normalized = T_R * right_homogeneous
-    
-        # Determine the fundamental matrix Fˆ from the singular vector corresponding to
-        # smallest singular value of Aˆ.
-        A_hat = get_matrix_A(left_normalized, right_normalized)
-        svd_A = svd(A_hat)
-        V = svd_A.V
-        F_hat = transpose(reshape(V[:, end], 3, 3))
-        svd_F = svd(F_hat)
-        
-        # Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
-        # has the smallest singular value set equal to zero.
-        D_corrected = Diagonal(svd_F.S)
-        F_normalized = svd_F.U * D_corrected * svd_F.Vt
-    
-        # Denormalize. See exercises week 6.
-        F = transpose(T_R) * F_normalized * T_L
-    
-        # Test with a ninth coordinate pair if F works.
-        ninth_coord_left = [249; 203; 1]
-        ninth_coord_right = [156; 222; 1]
-        test = transpose(ninth_coord_right) * F * ninth_coord_left
-        println(test)
+    # Calculate Fˆ′ from Fˆ using SVD such that Fˆ′ = UD′V^T and D'
+    # has the smallest singular value set equal to zero.
+    D_corrected = Diagonal(svd_F.S)
+    F_normalized = svd_F.U * D_corrected * svd_F.Vt
+
+    # Denormalize. See exercises week 6.
+    F = transpose(T_R) * F_normalized * T_L
+
+    # Test with a ninth coordinate pair if F works.
+    ninth_coord_left = [249; 203; 1]
+    ninth_coord_right = [156; 222; 1]
+    test = transpose(ninth_coord_right) * F * ninth_coord_left
+    println(test)
     return F
 end
 
@@ -63,7 +63,13 @@ end
 
 function find_epipoles(F)
     # TODO Fill in your code for finding epipoles el and er
-   #return el, er
+    svd_F = svd(F)
+    e_L = svd_F.V[:, end]
+    el = [e_L[1]/e_L[3] e_L[2]/e_L[3]]
+
+    e_R = svd_F.U[:, end]
+    er = [e_R[1]/e_R[3] e_R[2]/e_R[3]]
+    return el, er
 end
 
 
