@@ -70,8 +70,10 @@ function find_epipoles(F)
 end
 
 
-function estimate_cameras(F, er)
+function estimate_cameras(F)
     # TODO Fill in your code for estimating cameras Ml and Mr from F
+    el, er = find_epipoles(F)
+
     eRx = [0 -er[3] er[2];
         er[3] 0 -er[1];
         -er[2] er[1] 0]
@@ -112,13 +114,26 @@ function linear_triangulation(pl, Ml, pr, Mr)
     return X
 end
 
-function reprojection_error(N, pl, pr, X)
-    sum = 0
-    X_normalized = [X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]]
-    for i in 1:N
-        sum += abs(pl[i] - X_normalized[i]) + abs(pr[i] - X_normalized[i])
+#Error function that returns a list: to be used in gold standard algorithm
+#=function reprojection_error(N, pl, pr, X)
+    X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
+    #display(X_normalized)
+    err = zeros(1, 8)
+    for i in 1:8
+        err[1, i] = sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
+            sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
     end
-    error = (1/N) * sum
-    return error
-end
+    return err
+end=#
 
+function reprojection_error(N, pl, pr, X)
+    X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
+    sum = 0
+    err = zeros(1, 8)
+    for i in 1:8
+        sum += sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
+            sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
+    end
+    err = (1/N) * sum
+    return err
+end

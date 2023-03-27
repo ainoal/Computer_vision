@@ -1,4 +1,5 @@
 include("utils.jl")
+include("triangulation.jl")
 
 using LinearAlgebra
 using LsqFit
@@ -9,6 +10,12 @@ function minimize_geom_error(pl, pr, Ml, Mr0, X0)
         Mr, X = from_param(x)
         # TODO Fill in your code for calculating reprojection error
         # The output is a vector of errors for each point
+        X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
+        err = zeros(1, 8)
+        for i in 1:8
+            err[1, i] = sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
+                sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
+        end
         return err |> vec
     end
     to_param(Mr, X) = vcat(vec(Mr), vec(X))

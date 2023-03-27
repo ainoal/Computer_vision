@@ -31,14 +31,14 @@ include("triangulation.jl")
 function task1(Il, Ir, pl, pr)
     # TODO: Implement find_fundamental_matrix, estimate_cameras, linear_triangulation from file triangulation.jl
     F = find_fundamental_matrix(pl, pr)
-    el, er = find_epipoles(F)
-    Ml, Mr = estimate_cameras(F, er)
+    Ml, Mr = estimate_cameras(F)
     X = linear_triangulation(pl, Ml, pr, Mr)
 
     # TODO: Calculate reprojection error using Ml, Mr and X
     # pl, pr = given values
     # "hat values" = values in the matrix X projected by using Ml
     error = reprojection_error(8, pl, pr, X)
+    print("Error: ")
     println(error)
 end
 
@@ -77,5 +77,5 @@ function task3(Il, Ir, pl, pr)
 end
 
 task1(Il, Ir, pl, pr)
-#task2(Il, Ir, pl, pr)
+task2(Il, Ir, pl, pr)
 #task3(Il, Ir, pl, pr)
