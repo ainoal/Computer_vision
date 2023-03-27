@@ -36,6 +36,10 @@ function task1(Il, Ir, pl, pr)
     X = linear_triangulation(pl, Ml, pr, Mr)
 
     # TODO: Calculate reprojection error using Ml, Mr and X
+    # pl, pr = given values
+    # "hat values" = values in the matrix X projected by using Ml
+    error = reprojection_error(8, pl, pr, X)
+    println(error)
 end
 
 

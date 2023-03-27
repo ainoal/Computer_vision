@@ -65,11 +65,7 @@ function find_epipoles(F)
     # TODO Fill in your code for finding epipoles el and er
     svd_F = svd(F)
     e_L = svd_F.V[:, end]
-    #el = [e_L[1]/e_L[3] e_L[2]/e_L[3]]
-
     e_R = svd_F.U[:, end]
-    #er = [e_R[1]/e_R[3] e_R[2]/e_R[3]]
-    #return el, er
     return e_L, e_R
 end
 
@@ -80,45 +76,29 @@ function estimate_cameras(F, er)
         er[3] 0 -er[1];
         -er[2] er[1] 0]
 
-    display(eRx)
     # TODO: Check how to construct M_L and M_R
     Ml = hcat(Matrix{Int}(I, 3, 3), [0; 0; 0])
     Mr = hcat(eRx * F, er)
 
-    #Ml = Matrix{Int}(I, 3, 3)
-    #Mr = eRx * F
-
     return Ml, Mr
 end
+
 estimate_cameras(F) = estimate_cameras(F, find_epipoles(F)[2])
 
 function linear_triangulation(pl, Ml, pr, Mr)
     # TODO Fill in your code for linear triangulation
     len = size(pl)[2] - 1
-    #X = Matrix{Float64}
-    MlT = transpose(Ml)
-    MrT = transpose(Mr)
-    #println(transpose(Ml[3, :])))
-    #println(pl[1, 3] * MlT[3, :])
-    #println(MlT[1, :])
-    #println(pl[1, 1] * MlT[3, :] - MlT[1, :])
-    #for i in 0:(size(pl)[2] - 1)
-    #=A = [pl[1, 1] * MlT[3, :] - MlT[1, :];
-        pl[1, 2] * MlT[3, :] - MlT[2, :];
-        pr[1, 1] * MrT[3, :] - MrT[1, :];
-        pr[1, 2] * MrT[3, :] - MrT[2, :]]
-    display(A)=#
+
     A = [pl[1, 1] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
-    pl[2, 1] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
-    pr[1, 1] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
-    pr[2, 1] * transpose(Mr[3, :]) - transpose(Mr[2, :])]
+        pl[2, 1] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
+        pr[1, 1] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
+        pr[2, 1] * transpose(Mr[3, :]) - transpose(Mr[2, :])]
 
     svd_vals = svd(A)
     P = svd_vals.V[:, end]
     X = Ml * P
 
-
-    for i in 2:(len)
+    for i in 2:len
         A = [pl[1, i] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
             pl[2, i] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
             pr[1, i] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
@@ -127,11 +107,18 @@ function linear_triangulation(pl, Ml, pr, Mr)
         svd_vals = svd(A)
         P = svd_vals.V[:, end]
         X = hcat(X, Ml * P)
-        #display(Ml * P)
-        #display(A)
     end
+
     return X
 end
 
-
+function reprojection_error(N, pl, pr, X)
+    sum = 0
+    X_normalized = [X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]]
+    for i in 1:N
+        sum += abs(pl[i] - X_normalized[i]) + abs(pr[i] - X_normalized[i])
+    end
+    error = (1/N) * sum
+    return error
+end
 
