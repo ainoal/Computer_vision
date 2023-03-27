@@ -94,6 +94,8 @@ estimate_cameras(F) = estimate_cameras(F, find_epipoles(F)[2])
 
 function linear_triangulation(pl, Ml, pr, Mr)
     # TODO Fill in your code for linear triangulation
+    len = size(pl)[2] - 1
+    #X = Matrix{Float64}
     MlT = transpose(Ml)
     MrT = transpose(Mr)
     #println(transpose(Ml[3, :])))
@@ -106,16 +108,28 @@ function linear_triangulation(pl, Ml, pr, Mr)
         pr[1, 1] * MrT[3, :] - MrT[1, :];
         pr[1, 2] * MrT[3, :] - MrT[2, :]]
     display(A)=#
-
-    A = [pl[1, 1] * transpose(Ml[3, :]); # - transpose(Ml[1, :]);
-        pl[1, 2] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
-        pr[1, 1] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
-        pr[1, 2] * transpose(Mr[3, :]) - transpose(Mr[2, :])]
-    display(A)
+    A = [pl[1, 1] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
+    pl[2, 1] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
+    pr[1, 1] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
+    pr[2, 1] * transpose(Mr[3, :]) - transpose(Mr[2, :])]
 
     svd_vals = svd(A)
     P = svd_vals.V[:, end]
     X = Ml * P
+
+
+    for i in 2:(len)
+        A = [pl[1, i] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
+            pl[2, i] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
+            pr[1, i] * transpose(Mr[3, :]) - transpose(Mr[1, :]);
+            pr[2, i] * transpose(Mr[3, :]) - transpose(Mr[2, :])]
+
+        svd_vals = svd(A)
+        P = svd_vals.V[:, end]
+        X = hcat(X, Ml * P)
+        #display(Ml * P)
+        #display(A)
+    end
     return X
 end
 
