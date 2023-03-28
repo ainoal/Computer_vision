@@ -29,8 +29,10 @@ function find_fundamental_matrix(pl, pr)
     F = transpose(T_R) * F_normalized * T_L
 
     # Test with a ninth coordinate pair if F works.
-    ninth_coord_left = [249; 203; 1]
-    ninth_coord_right = [156; 222; 1]
+    ninth_coord_left = pl[:, 9]
+    ninth_coord_right = pr[:, 9]
+    ninth_coord_left = [ninth_coord_left; 1]
+    ninth_coord_right = [ninth_coord_right; 1]
     test = transpose(ninth_coord_right) * F * ninth_coord_left
     println(test)
     return F
@@ -85,10 +87,12 @@ function estimate_cameras(F)
     return Ml, Mr
 end
 
+# TODO: Function definitions! Check which parameters this function should take
 estimate_cameras(F) = estimate_cameras(F, find_epipoles(F)[2])
 
 function linear_triangulation(pl, Ml, pr, Mr)
-    # TODO Fill in your code for linear triangulation
+    # TODO Fill in your code for linear triangulation.
+    # NOTE: " do not forget to include normalization"
     len = size(pl)[2] - 1
 
     A = [pl[1, 1] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
@@ -128,12 +132,11 @@ end=#
 
 function reprojection_error(N, pl, pr, X)
     X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
-    sum = 0
-    err = zeros(1, 8)
+    err = 0
     for i in 1:8
-        sum += sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
+        err += sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
             sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
     end
-    err = (1/N) * sum
+    #err = (1/N) * sum
     return err
 end

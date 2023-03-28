@@ -33,12 +33,14 @@ function task1(Il, Ir, pl, pr)
     F = find_fundamental_matrix(pl, pr)
     Ml, Mr = estimate_cameras(F)
     X = linear_triangulation(pl, Ml, pr, Mr)
+    println("X:")
+    display(X)
 
     # TODO: Calculate reprojection error using Ml, Mr and X
     # pl, pr = given values
     # "hat values" = values in the matrix X projected by using Ml
     error = reprojection_error(8, pl, pr, X)
-    print("Error: ")
+    print("Reprojection error: ")
     println(error)
 end
 
@@ -65,12 +67,15 @@ function task3(Il, Ir, pl, pr)
 
     _, er = find_epipoles(F)
 
+    #deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
     Hr = deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
-    Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
+    println("Hr: ")
+    display(Hr)
+    #Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
 
-    rIl, rIr, y_offset = warp_images(Il, Hl, Ir, Hr)
+    #rIl, rIr, y_offset = warp_images(Il, Hl, Ir, Hr)
 
-    rectified_pair = hcat(rIl, rIr)
+    #rectified_pair = hcat(rIl, rIr)
 
     # TODO: Plot rectified images side-by-side along with epipolar lines on them
     # Do you notice the difference?
@@ -78,4 +83,4 @@ end
 
 task1(Il, Ir, pl, pr)
 task2(Il, Ir, pl, pr)
-#task3(Il, Ir, pl, pr)
+task3(Il, Ir, pl, pr)
