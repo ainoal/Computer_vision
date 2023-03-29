@@ -77,7 +77,7 @@ function task3(Il, Ir, pl, pr)
     Hr = deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
     println("Hr: ")
     display(Hr)
-    #Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
+    Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
 
     #rIl, rIr, y_offset = warp_images(Il, Hl, Ir, Hr)
 

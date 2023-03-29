@@ -42,7 +42,7 @@ function gold_standard(pl, pr)
     # TODO:
     #p_hat_L = Ml * X
     #X = vcat(X, [1 1 1 1 1 1 1 1])
-    p_hat = Ml
+    #p_hat = Ml
     
     # task 2e
     Mr, X = minimize_geom_error(pl, pr, Ml, Mr, X)
