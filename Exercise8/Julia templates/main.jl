@@ -16,7 +16,8 @@ plot_image!(p, I; kws...) = plot!(p, I; aspect_ratio=:equal, size=size(I), frame
 Il = load(joinpath(@__DIR__, "../data/books1.jpg"))
 Ir = load(joinpath(@__DIR__, "../data/books2.jpg"))
 
-
+# The first 8 coordinates have been used for 8 point algorithm and the 9th coordinate
+# has been used for testing the algorithm.
 pl = [249.1886  251.1865  185.7675  186.6054   96.5758   19.0369   87.8358  201.7579 72.6772;
 204.1058   50.1468   51.0201  126.5525   80.9284  148.0381  200.0909  205.3973 54.0182]
 pr = [154.4705  257.6632  199.4353  166.7630   95.2722   10.0000   35.7504  121.1513 85.2440;
@@ -106,6 +107,10 @@ function task3(Il, Ir, pl, pr)
         #plot!(x, y)
     end
     display(rp)
+
+    # I did not plot the epipolar lines on the images because
+    # (1) the left epipolar lines are incorrect and
+    # (2) my rectification is not working correctly
 end
 
 function plot_epipolar_lines(pl, pr, el, er)

@@ -24,8 +24,6 @@ function rectify_right(e, x₀)
     G = [1 0 0;
         0 1 0;
         -1/e_2[1] 0 1]
-    println("G: ")
-    display(G)
 
     e_3 = G ⊗ e_2
 
@@ -39,9 +37,6 @@ function rectify_left(pl, pr, Mr, Hr)
     for i in 2:8
         M = vcat(M, [pl[1, i] pl[2, i] 1 -pr[1, i]])
     end
-
-    println("M:")
-    display(M)
 
     svd_vals = svd(M)
     V = svd_vals.V
