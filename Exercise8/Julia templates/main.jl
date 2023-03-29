@@ -39,7 +39,7 @@ function task1(Il, Ir, pl, pr)
     # TODO: Calculate reprojection error using Ml, Mr and X
     # pl, pr = given values
     # "hat values" = values in the matrix X projected by using Ml
-    error = reprojection_error(8, pl, pr, X)
+    error = reprojection_error(pl, pr, X, Ml, Mr)
     print("Reprojection error: ")
     println(error)
 end
@@ -54,6 +54,12 @@ function task2(Il, Ir, pl, pr)
     F, pl, Ml, pr, Mr, X = gold_standard(pl, pr)
 
     # TODO: Plot both images and epipolar lines for each of the points from pl and pr
+    p = plot(Il)
+    display(p)
+    #plot()
+
+    p2 = plot(Ir)
+    display(p2)
 end
 
 
@@ -79,6 +85,12 @@ function task3(Il, Ir, pl, pr)
 
     # TODO: Plot rectified images side-by-side along with epipolar lines on them
     # Do you notice the difference?
+    #=
+    params = cross([ninth_coord[1]; ninth_coord[2]; 1], [e_R[1]; e_R[2]; 1])
+    x = [0, 306]
+    y(x) = (params[1] * x - params[3] / params[2])
+
+    =#
 end
 
 task1(Il, Ir, pl, pr)

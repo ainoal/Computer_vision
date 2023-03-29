@@ -1,4 +1,5 @@
 include("utils.jl")
+using LinearAlgebra
 
 function rectify_right(e, x₀)
     # TODO Implement algorithm for finding first rectification transform
@@ -7,8 +8,8 @@ function rectify_right(e, x₀)
 
     e_normalized = [e[1]/e[3]; e[2]/e[3]]
 
-    T = [0 0 -Ox;
-        0 0 -Oy;
+    T = [0 0 -e[1];
+        0 0 -e[2];
         0 0 1]
 
     e_1 = T ⊗ e_normalized
@@ -34,6 +35,17 @@ end
 
 function rectify_left(pl, pr, Mr, Hr)
     # TODO Implement algorithm for finding second rectification transform
-    #return Hl
-    return 0
+    svd_vals = svd(Hr)
+    V = svd_vals.V
+
+    F_hat = transpose(reshape(V[:, end], 3, 3))
+    svd_F = svd(F_hat)
+    
+    D_corrected = Diagonal(svd_F.S)
+    F_normalized = svd_F.U * D_corrected * svd_F.Vt
+
+    # Denormalize. See exercises week 6.
+    F = transpose(T_R) * F_normalized * T_L
+
+    return Hl
 end

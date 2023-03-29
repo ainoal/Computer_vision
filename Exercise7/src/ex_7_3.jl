@@ -28,7 +28,18 @@ function main()
     plot(right_img)
     plot!([e_R1], [e_R2], seriestype=:scatter, markersize=:4)
     plot!([ninth_coord[1]], [ninth_coord[2]], seriestype=:scatter, markersize=:4)
-    p = plot!([ninth_coord[1], e_R1], [ninth_coord[2], e_R2])
+    plot!([ninth_coord[1], e_R1], [ninth_coord[2], e_R2])
+
+    params = cross([ninth_coord[1]; ninth_coord[2]; 1], [e_R[1]; e_R[2]; 1])
+    x = [0, 306]
+    y(x) = (params[1] * x - params[3] / params[2])
+
+    p = plot!(x, y)
+    # color, legend:=false
+    #println([ninth_coord[1]; ninth_coord[2]; 1])
+    #println([e_R[1]; e_R[2]; 1])
+    #println(cross([ninth_coord[1]; ninth_coord[2]; 1], [e_R[1]; e_R[2]; 1]))
+
     display(p)
 end
 

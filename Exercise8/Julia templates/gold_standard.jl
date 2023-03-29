@@ -10,14 +10,17 @@ function minimize_geom_error(pl, pr, Ml, Mr0, X0)
         Mr, X = from_param(x)
         # TODO Fill in your code for calculating reprojection error
         # The output is a vector of errors for each point
+        X_homogeneous = vcat(X, [1 1 1 1 1 1 1 1])
+        pl_hat = Ml * X_homogeneous
+        pr_hat = Mr * X_homogeneous
 
-        # TODO: different X for left and right
+        pl_hat = transpose([pl_hat[1, :] ./ pl_hat[3, :] pl_hat[2, :] ./ pl_hat[3, :]])
+        pr_hat = transpose([pr_hat[1, :] ./ pr_hat[3, :] pr_hat[2, :] ./ pr_hat[3, :]])
 
-        X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
         err = zeros(eltype(x),(1, 8))
         for i in 1:8
-            err[1, i] = sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
-                sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
+            err[1, i] = sqrt((pl[1, i] - pl_hat[1, i])^2 + (pl[2, i] - pl_hat[2, i])^2) + 
+                sqrt((pr[1, i] - pr_hat[1, i])^2 + (pr[2, i] - pr_hat[2, i])^2)
         end
         
         return err |> vec
@@ -36,9 +39,10 @@ function gold_standard(pl, pr)
     X = linear_triangulation(pl, Ml, pr, Mr)
 
     # task 2d
-    # TODO: p_hat_R. We need both Xl and Xr
+    # TODO:
     #p_hat_L = Ml * X
     #X = vcat(X, [1 1 1 1 1 1 1 1])
+    p_hat = Ml
     
     # task 2e
     Mr, X = minimize_geom_error(pl, pr, Ml, Mr, X)

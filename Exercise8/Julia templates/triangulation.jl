@@ -25,7 +25,7 @@ function find_fundamental_matrix(pl, pr)
     D_corrected = Diagonal(svd_F.S)
     F_normalized = svd_F.U * D_corrected * svd_F.Vt
 
-    # Denormalize. See exercises week 6.
+    # Denormalize
     F = transpose(T_R) * F_normalized * T_L
 
     # Test with a ninth coordinate pair if F works.
@@ -63,6 +63,20 @@ function get_normalization_matrix(points2d, N)
     return T
 end
 
+function get_matrix_A(left, right)
+    Xr = right[1, :]
+    Yr = right[2, :]
+    Xl = left[1, :]
+    Yl = left[2, :]
+
+    A = [Xr[1]*Xl[1] Xr[1]*Yl[1] Xr[1] Yr[1]*Xl[1] Yr[1]*Yl[1] Yr[1] Xl[1] Yl[1] 1]
+    for n in 2:8
+        row = [Xr[n]*Xl[n] Xr[n]*Yl[n] Xr[n] Yr[n]*Xl[n] Yr[n]*Yl[n] Yr[n] Xl[n] Yl[n] 1]
+        A = vcat(A, row)
+    end
+    return A
+end
+
 function find_epipoles(F)
     # TODO Fill in your code for finding epipoles el and er
     svd_F = svd(F)
@@ -72,7 +86,7 @@ function find_epipoles(F)
 end
 
 
-function estimate_cameras(F)
+function estimate_cameras(F, er)
     # TODO Fill in your code for estimating cameras Ml and Mr from F
     el, er = find_epipoles(F)
 
@@ -86,14 +100,20 @@ function estimate_cameras(F)
 
     return Ml, Mr
 end
-
-# TODO: Function definitions! Check which parameters this function should take
 estimate_cameras(F) = estimate_cameras(F, find_epipoles(F)[2])
 
 function linear_triangulation(pl, Ml, pr, Mr)
     # TODO Fill in your code for linear triangulation.
     # NOTE: " do not forget to include normalization"
     len = size(pl)[2] - 1
+
+    #=T_L = get_normalization_matrix(pl[:, 1:8], 8)
+    T_R = get_normalization_matrix(pr[:, 1:8], 8)
+    left_homogeneous = vcat(pl[:, 1:8], ones(1, 8))
+    right_homogeneous = vcat(pr[:, 1:8], ones(1, 8))
+    pl = T_L * left_homogeneous
+    pr = T_R * right_homogeneous
+    =#
 
     A = [pl[1, 1] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
         pl[2, 1] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
@@ -118,25 +138,19 @@ function linear_triangulation(pl, Ml, pr, Mr)
     return X
 end
 
-#Error function that returns a list: to be used in gold standard algorithm
-#=function reprojection_error(N, pl, pr, X)
-    X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
-    #display(X_normalized)
-    err = zeros(1, 8)
-    for i in 1:8
-        err[1, i] = sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
-            sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
-    end
-    return err
-end=#
+function reprojection_error(pl, pr, X, Ml, Mr)
+    X_homogeneous = vcat(X, [1 1 1 1 1 1 1 1])
+    pl_hat = Ml * X_homogeneous
+    pr_hat = Mr * X_homogeneous
 
-function reprojection_error(N, pl, pr, X)
-    X_normalized = transpose([X[1, :] ./ X[3, :] X[2, :] ./ X[3, :]])
+    pl_hat = transpose([pl_hat[1, :] ./ pl_hat[3, :] pl_hat[2, :] ./ pl_hat[3, :]])
+    pr_hat = transpose([pr_hat[1, :] ./ pr_hat[3, :] pr_hat[2, :] ./ pr_hat[3, :]])
+
     err = 0
     for i in 1:8
-        err += sqrt((pl[1, i] - X_normalized[1, i])^2 + (pl[2, i] - X_normalized[2, i])^2) + 
-            sqrt((pr[1, i] - X_normalized[1, i])^2 + (pr[2, i] - X_normalized[2, i])^2)
+        err += sqrt((pl[1, i] - pl_hat[1, i])^2 + (pl[2, i] - pl_hat[2, i])^2) + 
+            sqrt((pr[1, i] - pr_hat[1, i])^2 + (pr[2, i] - pr_hat[2, i])^2)
     end
-    #err = (1/N) * sum
     return err
+
 end
