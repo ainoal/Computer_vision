@@ -54,12 +54,20 @@ function task2(Il, Ir, pl, pr)
     F, pl, Ml, pr, Mr, X = gold_standard(pl, pr)
 
     # TODO: Plot both images and epipolar lines for each of the points from pl and pr
-    p = plot(Il)
-    display(p)
-    #plot()
+    el, er = find_epipoles(F)
+    plot(Il)
 
-    p2 = plot(Ir)
-    display(p2)
+    left_coord = pl[:, 1]
+    params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
+    x = [0, 306]
+    y(x) = (params_l[1] * x - params_l[3] / params_l[2])
+    p = plot!(x, y)
+
+    display(p)
+
+    #p2 = plot(Ir)
+    #ninth_coord_right = pr[:, 8]
+    #display(p2)
 end
 
 
