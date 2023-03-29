@@ -37,12 +37,6 @@ function gold_standard(pl, pr)
     F = find_fundamental_matrix(pl, pr)
     Ml, Mr = estimate_cameras(F)
     X = linear_triangulation(pl, Ml, pr, Mr)
-
-    # task 2d
-    # TODO:
-    #p_hat_L = Ml * X
-    #X = vcat(X, [1 1 1 1 1 1 1 1])
-    #p_hat = Ml
     
     # task 2e
     Mr, X = minimize_geom_error(pl, pr, Ml, Mr, X)

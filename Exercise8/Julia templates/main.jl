@@ -45,25 +45,8 @@ function task1(Il, Ir, pl, pr)
 
     # Plotting the epipolar lines
     el, er = find_epipoles(F)
-    pltl = plot(Il)
-    for i in 1:8
-        left_coord = pl[:, i]
-        params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
-        x = [0, 306]
-        y(x) = (params_l[1] * x - params_l[3]) / params_l[2]
-        plot!(x, y)
-    end
-    display(pltl)
-
-    pltr = plot(Ir)
-    for i in 1:8
-        right_coord = pr[:, i]
-        params_r = cross([right_coord[1]; right_coord[2]; 1], [er[1]; er[2]; er[3]])
-        x = [0, 306]
-        y(x) = (params_r[1] * x - params_r[3]) / params_r[2]
-        plot!(x, y)
-    end
-    display(pltr)
+    plot_epipolar_lines(pl, pr, el, er)
+ 
 end
 
 
@@ -77,8 +60,55 @@ function task2(Il, Ir, pl, pr)
 
     # TODO: Plot both images and epipolar lines for each of the points from pl and pr
     el, er = find_epipoles(F)
-    pltl = plot(Il)
+    plot_epipolar_lines(pl, pr, el, er)
+    
+end
 
+
+# TASK 3
+
+include("rectification.jl")
+
+function task3(Il, Ir, pl, pr)
+    # TODO: Implement rectify_right, rectify_left from file rectification.jl
+
+    # Rectification means transforming a pair of stereo images so that conjugate epipolar
+    # lines become collinear and parallel to one of the image axes. Rectification
+    # is used in computer vision to simplify finding matching points between stereo images.
+
+    F, pl, Ml, pr, Mr, X = gold_standard(pl, pr)
+
+    _, er = find_epipoles(F)
+
+    Hr = deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
+    Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
+
+    println("Hl:")
+    display(Hl)
+    println("Hr:")
+    display(Hr)
+
+    rIl, rIr, y_offset = warp_images(Il, Hl, Ir, Hr)
+
+    rectified_pair = hcat(rIl, rIr)
+
+    # TODO: Plot rectified images side-by-side along with epipolar lines on them
+    # Do you notice the difference?
+
+    rp = plot(rectified_pair)
+    el, er = find_epipoles(F)
+
+    for i in 1:8
+        left_coord = pl[:, i]
+        params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
+        x = [0, 306]
+        y(x) = (params_l[1] * x - params_l[3]) / params_l[2]
+        #plot!(x, y)
+    end
+    display(rp)
+end
+
+function plot_epipolar_lines(pl, pr, el, er)
     pltl = plot(Il)
     for i in 1:8
         left_coord = pl[:, i]
@@ -98,42 +128,8 @@ function task2(Il, Ir, pl, pr)
         plot!(x, y)
     end
     display(pltr)
-
-    #p2 = plot(Ir)
-    #ninth_coord_right = pr[:, 8]
-    #display(p2)
 end
 
-
-# TASK 3
-
-include("rectification.jl")
-
-function task3(Il, Ir, pl, pr)
-    # TODO: Implement rectify_right, rectify_left from file rectification.jl
-    F, pl, Ml, pr, Mr, X = gold_standard(pl, pr)
-
-    _, er = find_epipoles(F)
-
-    #deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
-    Hr = deshear(rectify_right(er, reverse(size(Ir))./2), Ir)
-    println("Hr: ")
-    display(Hr)
-    Hl = deshear(rectify_left(pl, pr, Mr, Hr), Il)
-
-    #rIl, rIr, y_offset = warp_images(Il, Hl, Ir, Hr)
-
-    #rectified_pair = hcat(rIl, rIr)
-
-    # TODO: Plot rectified images side-by-side along with epipolar lines on them
-    # Do you notice the difference?
-    #=
-    params = cross([ninth_coord[1]; ninth_coord[2]; 1], [e_R[1]; e_R[2]; 1])
-    x = [0, 306]
-    y(x) = (params[1] * x - params[3] / params[2])
-
-    =#
-end
 
 task1(Il, Ir, pl, pr)
 task2(Il, Ir, pl, pr)

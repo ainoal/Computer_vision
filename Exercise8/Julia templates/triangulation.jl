@@ -88,8 +88,6 @@ end
 
 function estimate_cameras(F, er)
     # TODO Fill in your code for estimating cameras Ml and Mr from F
-    el, er = find_epipoles(F)
-
     eRx = [0 -er[3] er[2];
         er[3] 0 -er[1];
         -er[2] er[1] 0]
@@ -106,14 +104,6 @@ function linear_triangulation(pl, Ml, pr, Mr)
     # TODO Fill in your code for linear triangulation.
     # NOTE: " do not forget to include normalization"
     len = size(pl)[2] - 1
-
-    #=T_L = get_normalization_matrix(pl[:, 1:8], 8)
-    T_R = get_normalization_matrix(pr[:, 1:8], 8)
-    left_homogeneous = vcat(pl[:, 1:8], ones(1, 8))
-    right_homogeneous = vcat(pr[:, 1:8], ones(1, 8))
-    pl = T_L * left_homogeneous
-    pr = T_R * right_homogeneous
-    =#
 
     A = [pl[1, 1] * transpose(Ml[3, :]) - transpose(Ml[1, :]);
         pl[2, 1] * transpose(Ml[3, :]) - transpose(Ml[2, :]);
