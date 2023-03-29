@@ -42,6 +42,28 @@ function task1(Il, Ir, pl, pr)
     error = reprojection_error(pl, pr, X, Ml, Mr)
     print("Reprojection error: ")
     println(error)
+
+    # Plotting the epipolar lines
+    el, er = find_epipoles(F)
+    pltl = plot(Il)
+    for i in 1:8
+        left_coord = pl[:, i]
+        params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
+        x = [0, 306]
+        y(x) = (params_l[1] * x - params_l[3]) / params_l[2]
+        plot!(x, y)
+    end
+    display(pltl)
+
+    pltr = plot(Ir)
+    for i in 1:8
+        right_coord = pr[:, i]
+        params_r = cross([right_coord[1]; right_coord[2]; 1], [er[1]; er[2]; er[3]])
+        x = [0, 306]
+        y(x) = (params_r[1] * x - params_r[3]) / params_r[2]
+        plot!(x, y)
+    end
+    display(pltr)
 end
 
 
@@ -55,15 +77,27 @@ function task2(Il, Ir, pl, pr)
 
     # TODO: Plot both images and epipolar lines for each of the points from pl and pr
     el, er = find_epipoles(F)
-    plot(Il)
+    pltl = plot(Il)
 
-    left_coord = pl[:, 1]
-    params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
-    x = [0, 306]
-    y(x) = (params_l[1] * x - params_l[3] / params_l[2])
-    p = plot!(x, y)
+    pltl = plot(Il)
+    for i in 1:8
+        left_coord = pl[:, i]
+        params_l = cross([left_coord[1]; left_coord[2]; 1], [el[1]; el[2]; el[3]])
+        x = [0, 306]
+        y(x) = (params_l[1] * x - params_l[3]) / params_l[2]
+        plot!(x, y)
+    end
+    display(pltl)
 
-    display(p)
+    pltr = plot(Ir)
+    for i in 1:8
+        right_coord = pr[:, i]
+        params_r = cross([right_coord[1]; right_coord[2]; 1], [er[1]; er[2]; er[3]])
+        x = [0, 306]
+        y(x) = (params_r[1] * x - params_r[3]) / params_r[2]
+        plot!(x, y)
+    end
+    display(pltr)
 
     #p2 = plot(Ir)
     #ninth_coord_right = pr[:, 8]
