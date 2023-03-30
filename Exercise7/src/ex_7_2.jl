@@ -50,7 +50,7 @@ function get_fundamental_matrix()
     # Determine the fundamental matrix Fˆ from the singular vector corresponding to
     # smallest singular value of Aˆ.
     A_hat = get_matrix_A(left_normalized, right_normalized)
-    svd_A = svd(A_hat)
+    svd_A = svd(A_hat, full=true)
     V = svd_A.V
     F_hat = transpose(reshape(V[:, end], 3, 3))
     svd_F = svd(F_hat)
