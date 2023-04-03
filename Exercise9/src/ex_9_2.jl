@@ -8,15 +8,17 @@ function main()
     # Load the sequence of images and stack them to a 3D matrix with dimensions
     # height x width x time
     img_seq = readdir(joinpath(@__DIR__, "../data/seq1"))
-    img_matrix = load(joinpath(@__DIR__, "../data/seq1/", img_seq[1]))
+    first_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[1]))
+    img_matrix = imresize(first_img, ratio=1/8);
     for i in 2:10
         new_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[i]))
+        new_img = imresize(new_img, ratio=1/8)
         img_matrix = cat(img_matrix, new_img; dims=3)
     end
 
     # Smooth along dimensions h x w with a Gaussian filter
     dimensions = size(img_matrix)
-    sigma = 1.5     # Standard deviation
+    sigma = 1.5         # Standard deviation
     gaussians = zeros(RGB{Float64}, dimensions[1], dimensions[2], dimensions[3])
     for img in 1:dimensions[3]
         gaussians[:, :, img] = imfilter(img_matrix[:, :, img], Kernel.gaussian(sigma))
@@ -37,48 +39,57 @@ function main()
     Ix_g = Ix_n .|> Gray
     Iy_g = Iy_n .|> Gray
     It_g = It_n .|> Gray
-    gradients = zip.(Ix_g, Iy_g, It_g)
-    #display(gradients)
+    gradients = cat(Ix_g, Iy_g, It_g; dims=3)
 
     # For each pixel of the image sequence, compute matrix A and vector b
-    #A = zeros(5 * 5, 2)
-    window = (5, 5, 5)
-    # TODO: initialize empty matrices A and b
-    #for img in 1:dimensions[3]
-    A = mapwindow(find_A_and_b, gradients, window)
-        #display(A)
-    #end
-end
+    window = (5, 5, 3)
+    v = mapwindow(find_v, gradients, window)
 
-function find_A_and_b(vals)
-    A = zeros(5*5, 2)
-    b = zeros(5*5)
-
-    v = collect(vals)
-    display(v)
-    #=for i in 1:5
-        for j in 1:5
-            println(vals[i, j, 2][2])
-            A[5*i-5 + j, 2] = vals[i, j, 3, 1]
+    # Plot the optical flow
+    p = plot_image(first_img)
+    for i in 1:dimensions[1]
+        for j in 1:dimensions[2]
+            quiver!(i, j, quiver=(v[1],v[2]))
         end
-    end=#
-
-    return A
+    end
 end
 
-function mapdimension(vals)
-    v = zeros(5*5)
-    #vec = 
-    println()
+function find_v(vals)
+    A = zeros(5 * 5, 2)
+    b = zeros(5 * 5)
+
     for i in 1:5
         for j in 1:5
-            #println(vals[i, j, 3][3])
-            v[i, j] = vals[i, j]
+            A[5*i-5 + j, 1] = vals[i, j, 1]     # 1 = x values
+            A[5*i-5 + j, 2] = vals[i, j, 2]     # 2 = y values
+            b[5*i-5 + j] = -vals[i, j, 3]       # 3 = t values
         end
     end
 
-    return v
+    if (is_invertable(transpose(A) * A ))
+        R = (det(transpose(A) * A ) - 0.04 * tr(T))
+        if (abs(R) > 0.001)
+            vec = (transpose(A) * A) \ transpose(A) * b
+        else
+            vec = zeros(eltype(vals), 2)
+        end
+    else
+        vec = zeros(eltype(vals), 2)
+    end
+
+    return vec
 end
 
-main()
+function is_invertable(M)
+    # If determinant not equal to 0, is invertable
+    if (det(M) == 0)
+        return false
+    else
+        return true
+    end
+end
 
+plot_image(img; kws...) = 
+    plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
+
+main()
