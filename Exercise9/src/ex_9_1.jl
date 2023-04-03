@@ -3,8 +3,6 @@ using Pkg
 using Plots
 Pkg.instantiate()
 
-# TODO: Apply the same algorithm to image sequence 2
-
 function main()
     # Load the sequence of images and stack them to a 3D matrix with dimensions
     # height x width x time
@@ -14,7 +12,18 @@ function main()
         new_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[i]))
         img_matrix = cat(img_matrix, new_img; dims=3)
     end
+    motion_segmentation(img_matrix)
 
+    img_seq2 = readdir(joinpath(@__DIR__, "../data/seq1"))
+    img_matrix2 = load(joinpath(@__DIR__, "../data/seq1/", img_seq2[1]))
+    for i in 2:10
+        new_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq2[i]))
+        img_matrix2 = cat(img_matrix2, new_img; dims=3)
+    end
+    motion_segmentation(img_matrix2)
+end
+
+function motion_segmentation(img_matrix)
     # Convert to grayscale
     gray_matrix = Gray.(img_matrix)
 
@@ -36,7 +45,8 @@ function main()
     end
 
     for frame in 1:(dimensions[3] - 1)
-        motion = plot_image(Gray.(difference_matrix[:, :, frame]), title = "Difference")
+        motion = plot_image(Gray.(difference_matrix[:, :, frame]), 
+            title = "Difference")
         display(motion)
     end
 end
