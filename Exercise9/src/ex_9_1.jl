@@ -1,5 +1,6 @@
 using Images
 using Pkg
+using Plots
 Pkg.instantiate()
 
 function main()
@@ -16,9 +17,9 @@ function main()
     gray_matrix = Gray.(img_matrix)
 
     # Implement motion segmentation based on image difference.
-    treshold = 0.99
+    treshold = 0.5
     dimensions = size(gray_matrix)
-    difference_matrix = falses(dimensions[1], dimensions[2], dimensions[3] - 1)
+    difference_matrix = zeros(dimensions[1], dimensions[2], dimensions[3] - 1)
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
             for img in 1:(dimensions[3] - 1)
@@ -26,7 +27,7 @@ function main()
                 difference = gray_matrix[i, j, img] - gray_matrix[i, j, img + 1]
                 # Step 2: if the difference is larger than treshold, the pixel is moving
                 if (abs(difference) > treshold)
-                    difference_matrix[i, j, img] = true
+                    difference_matrix[i, j, img] = 1
                 end
             end
         end
