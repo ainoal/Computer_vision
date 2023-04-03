@@ -5,12 +5,6 @@ using LinearAlgebra
 
 
 function main()
-    #xval = 1
-    #yval = 1
-    #tval = 1
-
-
-
     # Load the sequence of images and stack them to a 3D matrix with dimensions
     # height x width x time
     img_seq = readdir(joinpath(@__DIR__, "../data/seq1"))
@@ -44,48 +38,46 @@ function main()
     Iy_g = Iy_n .|> Gray
     It_g = It_n .|> Gray
     gradients = zip.(Ix_g, Iy_g, It_g)
-    #gradients = zip.(Ix, Iy, It)
     #display(gradients)
 
     # For each pixel of the image sequence, compute matrix A and vector b
+    #A = zeros(5 * 5, 2)
     window = (5, 5, 5)
     # TODO: initialize empty matrices A and b
-    for img in 1:dimensions[3]
-        A = mapwindow(find_A_and_b, gradients, window)
-    end
-
-    window_t = 5
-    #=for i in 1:dimensions[1]
-        for j in 1:dimensions[2]
-            display(gaussians[i, j, :])
-            #b = mapwindow(find_b, gaussians[i, j, :], window_t)
-        end
-    end=#
-
+    #for img in 1:dimensions[3]
+    A = mapwindow(find_A_and_b, gradients, window)
+        #display(A)
+    #end
 end
 
 function find_A_and_b(vals)
     A = zeros(5*5, 2)
     b = zeros(5*5)
-    #println((vals)[5, 6, 5])
-    #println(" ")
-    #=for val in vals[:, 1, 1]
-        display(len)
-    end=#
-    for i in 1:5
+
+    v = collect(vals)
+    display(v)
+    #=for i in 1:5
         for j in 1:5
             println(vals[i, j, 2][2])
             A[5*i-5 + j, 2] = vals[i, j, 3, 1]
         end
-    end
-    #=for i in 1:5
-        for j in 1:5
-            A[5*i-5 + j, 1] = Ix_g[xval, yval, tval]
-            A[5*i-5 + j, 2] = Iy_g[xval, yval, tval]
-            #println(yval)
-        end
     end=#
+
     return A
+end
+
+function mapdimension(vals)
+    v = zeros(5*5)
+    #vec = 
+    println()
+    for i in 1:5
+        for j in 1:5
+            #println(vals[i, j, 3][3])
+            v[i, j] = vals[i, j]
+        end
+    end
+
+    return v
 end
 
 main()

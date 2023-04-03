@@ -3,6 +3,8 @@ using Pkg
 using Plots
 Pkg.instantiate()
 
+# TODO: Apply the same algorithm to image sequence 2
+
 function main()
     # Load the sequence of images and stack them to a 3D matrix with dimensions
     # height x width x time
