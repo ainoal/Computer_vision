@@ -46,7 +46,7 @@ function motion_segmentation(img_matrix)
 
     for frame in 1:(dimensions[3] - 1)
         motion = plot_image(Gray.(difference_matrix[:, :, frame]), 
-            title = "Difference")
+            title = "Difference between image frames")
         display(motion)
     end
 end

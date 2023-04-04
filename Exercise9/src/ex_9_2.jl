@@ -3,12 +3,12 @@ using ImageFiltering
 using Statistics
 using LinearAlgebra
 
-img_seq = readdir(joinpath(@__DIR__, "../data/seq1"))
-first_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[1]))
-
 function main()
+    plotlyjs()
     # Load the sequence of images and stack them to a 3D matrix with dimensions
     # height x width x time
+    img_seq = readdir(joinpath(@__DIR__, "../data/seq1"))
+    first_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[1]))
     img_matrix = imresize(first_img, ratio=1/4)
     for i in 2:10
         new_img = load(joinpath(@__DIR__, "../data/seq1/", img_seq[i]))
@@ -46,15 +46,15 @@ function main()
     v = mapwindow(find_v, gradients, window)
 
     # Plot the optical flow
-    p = plot_image(imresize(first_img, ratio=1/4))
+    p = plot_image(imresize(Gray.(first_img), ratio=1/4))
     for i in 1:dimensions[1]
         for j in 1:dimensions[2]
-            if (mod(5, i) == 0)
+            if (mod(i, 5) == 0)
                 quiver!(i, j, quiver=(v[1],v[2]))
             end
         end
     end
-    #display(p)
+    display(p)
 end
 
 function find_v(vals)
@@ -95,6 +95,6 @@ function is_invertable(M)
 end
 
 plot_image(img; kws...) = 
-    plot(img; aspect_ratio=:equal, size=size(first_img), framestyle=:none, kws...)
+    plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
 
 main()
