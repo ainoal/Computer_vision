@@ -3,13 +3,27 @@ using Plots
 
 function main()
     slow_data = matread(joinpath(@__DIR__, "../data/slow_square.mat"))
-    track(slow_data)
+    track(slow_data, "slow_square")
+
+    fast_data = matread(joinpath(@__DIR__, "../data//fast_square.mat"))
+    track(fast_data, "fast_square")
+
+    # The same tracking algorithm works for both image sequences.
+    # However, if the largest allowed displacement was smaller than
+    # the movement of the square between two frames, the algorithm
+    # would not work anymore. 
+
+    # With more complex images, choosing the correct maximum displacement 
+    # should be done more precisely because choosing a too large values
+    # could lead to matching the template with a wrong area of the picture.
+    # With these image sequences, however, there is no fear for that since
+    # there is only one white square in the otherwise black scene.
 end
 
-function track(data)
+function track(data, seq_name)
     start_point = data["start_point"]
     template = data["template"]
-    seq = data["slow_square"]
+    seq = data[seq_name]
     no_of_images = size(seq)[3]
 
     largest_allowed_displacement = 25
@@ -41,7 +55,7 @@ function track(data)
         end
         p = p + d
 
-        plt = plot(Gray.(thisimg))
+        plt = plot(Gray.(thisimg), title=seq_name)
         plot!([p[1]], [p[2]], seriestype=:scatter)
         display(plt)
     end
@@ -52,8 +66,5 @@ function ssd(prev_coord, this_coord, previmg, thisimg)
     ssd = -(previmg[prev_coord[1], prev_coord[2]] - thisimg[this_coord[1], this_coord[2]])^2
     return ssd
 end
-
-#plot_image(img; kws...) = 
-#    plot(img; aspect_ratio=:equal, size=size(img), framestyle=:none, kws...)
 
 main()
