@@ -6,7 +6,6 @@ function main()
     slow_data = matread(joinpath(@__DIR__, "../data/slow_square.mat"))
     track(slow_data, "slow_square")
 
-
     fast_data = matread(joinpath(@__DIR__, "../data//fast_square.mat"))
     track(fast_data, "fast_square")
 end
@@ -72,11 +71,17 @@ function track(data, seq_name)
         end
         p = p + d
 
+        # The corners of the box
+        corner1 = [p[1]; p[2]]
+        corner2 = [p[1]+sz[1]; p[2]]
+        corner3 = [p[1]+sz[1]; p[2]+sz[2]]
+        corner4 = [p[1]; p[2]+sz[2]]
+
         plt = plot(Gray.(thisimg), title=seq_name)
-        plot!([p[1]], [p[2]], seriestype=:scatter)
-        plot!([p[1]], [p[2]+sz[2]], seriestype=:scatter)
-        plot!([p[1]+sz[1]], [p[2]], seriestype=:scatter)
-        plot!([p[1]+sz[1]], [p[2]+sz[2]], seriestype=:scatter)
+        plot!(corner1, corner2)
+        plot!(corner2, corner3)
+        plot!(corner3, corner4)
+        plot!(corner4, corner1)
         display(plt)
     end
 
