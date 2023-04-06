@@ -36,7 +36,18 @@ function track(img, template)
             end
         end
     end
-    display(template_histogram)
+    #display(template_histogram)
+
+    # Normalize template histogram
+    no_of_pixels = sz[1] * sz[2]
+    for rval in 1:2
+        for gval in 1:2
+            for bval in 1:2
+                template_histogram[rval, gval, bval] /= no_of_pixels
+            end
+        end
+    end
+    #display(template_histogram)
 
     # For each pixel in a target patch, find an appropriate bin u
     # of the RGB colour in histogram. Add 1 to that bin u
