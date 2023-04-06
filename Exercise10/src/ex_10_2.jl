@@ -52,6 +52,8 @@ function track(data, seq_name)
         end
         p = p + d
 
+        largest_similarity = -Inf
+        d = [0; 0]
         # Perform tracking using the full resolution image
         for dx in -largest_allowed_displacement:largest_allowed_displacement
             for dy in -largest_allowed_displacement:largest_allowed_displacement
