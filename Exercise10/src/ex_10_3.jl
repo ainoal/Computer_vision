@@ -6,7 +6,7 @@ function main()
     template = load(joinpath(@__DIR__, "../data/template.png"))
 
     # As the lecture slides define p(x) as the color histogram of a region
-    # *centered* at image point x but the starting points of task 10.3
+    # centered at image point x but the starting points of task 10.3
     # are on the upper left corners of the squares as per figure 2 of task assignment,
     # I am adding half template size to the x and y coordinates of each starting
     # point so that I can use the algorithm from the slides more easily.
@@ -23,7 +23,7 @@ function track(img, template, x)
     sz = size(template)
     println(sz)
 
-    # Construct template histogram
+    # Construct template histogram.
     # For each pixel in a target patch, find an appropriate bin u
     # of the RGB colour in histogram. Add 1 to that bin u.
     template_histogram = zeros(2, 2, 2)
@@ -67,24 +67,19 @@ function track(img, template, x)
     # Compute mean shift and update
     while(true)
         # Compute histogram of the region
-        no_of_pixels_region = no_of_pixels
         region_histogram = zeros(2, 2, 2)
         for i in 1:sz[1]
             for j in 1:sz[2]
 
                 try
                     point = img[Int64(x[1] + i - sz[1]/2), Int64(x[2] + j - sz[2]/2)]
-                    #print(Int64(x[1] + i - sz[1]/2))
-                    #print(",")
-                    #println(Int64(x[2] + j - sz[2]/2))
                     if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))        # red 
                         region_histogram[1, 2, 2] += 1
-                        #println("red")
                     elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
                         region_histogram[2, 1, 2] += 1
                     elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 1))    # blue
                         region_histogram[2, 2, 1] += 1
-                        #println("blue")
+
                     elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 0))    # black
                         region_histogram[2, 2, 2] += 1
                     elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 1))    # white
@@ -99,8 +94,7 @@ function track(img, template, x)
                         region_histogram[2, 1, 1] += 1
                     end
                 catch BoundsError
-                    #println("BoundsError")
-                    #no_of_pixels_region -=1
+                    println("Bounds Error")
                     
                 end
 
@@ -111,11 +105,11 @@ function track(img, template, x)
         for rval in 1:2
             for gval in 1:2
                 for bval in 1:2
-                    region_histogram[rval, gval, bval] /= no_of_pixels_region
+                    region_histogram[rval, gval, bval] /= no_of_pixels
                 end
             end
         end
-        display(region_histogram)
+        #display(region_histogram)
         
         # Compute weight
         w = zeros(sz[1], sz[2])
@@ -123,17 +117,14 @@ function track(img, template, x)
             for j in 1:sz[2]
 
                 try
-                    #point = [x[1] + i - sz[1]/2, x[2] + j - sz[2]/2]
                     point = img[Int64(x[1] + i - sz[1]/2), Int64(x[2] + j - sz[2]/2)]
                     
                     if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))         # red 
                         w[i, j] += sqrt(template_histogram[1, 2, 2] / region_histogram[1, 2, 2])
-                        #println(w[i, j])
                     elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
                         w[i, j] += sqrt(template_histogram[2, 1, 2] / region_histogram[2, 1, 2])
                     elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 1))    # blue
                         w[i, j] += sqrt(template_histogram[2, 2, 1] / region_histogram[2, 2, 1])
-                        #println(w[i, j])
                     elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 0))    # black
                         w[i, j] += sqrt(template_histogram[2, 2, 2] / region_histogram[2, 2, 2])
                     elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 1))    # white
@@ -148,25 +139,20 @@ function track(img, template, x)
                         w[i, j] += sqrt(template_histogram[2, 1, 1] / region_histogram[2, 1, 1])
                     end
                 catch BoundsError
-                    #println("Bounds Error")
+                    println("Bounds Error")
                 end
 
             end
         end
 
-        #println(w)
-
         # Compute new x
         sumw = 0
         sumwx = [0, 0]
-        #for i in -(sz[1]/2):(sz[1]/2)
-        #    for j in -(sz[2]/2):(sz[2]/2)
         for i in 1:sz[1]
             for j in 1:sz[2]
                 point = [x[1] + i - sz[1]/2, x[2] + j - sz[2]/2]
                 sumwx += point * w[i, j]
                 sumw += w[i, j]
-                #println(sumw)
             end
         end
         if (sumw == 0)
@@ -180,11 +166,17 @@ function track(img, template, x)
         new_x[1] = round(Int64, new_x[1])
         new_x[2] = round(Int64, new_x[2])
 
-        # break if x does not get updated anymore
+        # Break if x does not get updated anymore and plot the result.
         if (new_x == x)
-            println("jee")
             plt = plot(img)
             plot!([new_x[1]], [new_x[2]], seriestype=:scatter)
+
+            # Plot the corners of the square
+            plot!([new_x[1] - sz[1]/2], [new_x[2] - sz[2]/2], seriestype=:scatter)
+            plot!([new_x[1] - sz[1]/2], [new_x[2] + sz[2]/2], seriestype=:scatter)
+            plot!([new_x[1] + sz[1]/2], [new_x[2] - sz[2]/2], seriestype=:scatter)
+            plot!([new_x[1] + sz[1]/2], [new_x[2] + sz[2]/2], seriestype=:scatter)
+
             display(plt)
             break
         end
@@ -193,6 +185,10 @@ function track(img, template, x)
         x = new_x
 
     end
+end
+
+function construct_histogram()
+
 end
 
 main()
