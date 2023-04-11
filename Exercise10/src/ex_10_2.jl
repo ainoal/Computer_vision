@@ -41,7 +41,7 @@ function track(data, seq_name)
                     for m in 1:(sz[2]/2)
                         template_coord = [Int64(floor(l)), Int64(floor(m))]
                         thishalfres_coord = Vector{Int64}([floor(p[1]/2 + l + dx); floor(p[2]/2 + m + dy)])
-                        c += ssd(template_coord, thishalfres_coord, template, thishalfres)
+                        c += diff(template_coord, thishalfres_coord, template, thishalfres)
                     end
                 end
                 if (c > largest_similarity)
@@ -89,9 +89,9 @@ function track(data, seq_name)
 
 end
 
-function ssd(template_coord, this_coord, template, thisimg)
-    ssd = -(template[template_coord[1], template_coord[2]] - thisimg[this_coord[1], this_coord[2]])^2
-    return ssd
+function diff(template_coord, this_coord, template, thisimg)
+    diff = -(template[template_coord[1], template_coord[2]] - thisimg[this_coord[1], this_coord[2]])^2
+    return diff
 end
 
 main()
