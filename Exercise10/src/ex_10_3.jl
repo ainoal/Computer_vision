@@ -17,11 +17,20 @@ function main()
     track(img, template, starting_point1)
     track(img, template, starting_point2)
     track(img, template, starting_point3)
+
+    # Starting from starting_point1, the tracker stabilizes to a location that
+    # matches the template. However, starting from starting_point2, the tracker
+    # stabilizes to a location that matches only the histogram of the template
+    # but the pattern is not the same. This can happen with histogram tracking,
+    # since we essentially only compare the amount of each color in a region with 
+    # the template. Starting from starting_point3, my tracker stabilizes in
+    # a point that even has incorrect colors because the region around starting
+    # point has no red and the tracker does not know which way it should move.
+    # See all 3 plots to see the differences.
 end
 
 function track(img, template, x)
     sz = size(template)
-    println(sz)
 
     # Construct template histogram.
     # For each pixel in a target patch, find an appropriate bin u
@@ -30,39 +39,13 @@ function track(img, template, x)
     for i in 1:sz[1]
         for j in 1:sz[2]
             point = template[i, j]
-            if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))        # red 
-                template_histogram[1, 2, 2] += 1
-            elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
-                template_histogram[2, 1, 2] += 1
-            elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 1))    # blue
-                template_histogram[2, 2, 1] += 1
-            elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 0))    # black
-                template_histogram[2, 2, 2] += 1
-            elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 1))    # white
-                template_histogram[1, 1, 1] += 1
-
-            # Mixes of two colors
-            elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 0))
-                template_histogram[1, 1, 2] += 1
-            elseif ((red(point) == 1) && (blue(point) == 0) && (green(point) == 1))
-                template_histogram[1, 2, 1] += 1
-            elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 1))
-                template_histogram[2, 1, 1] += 1
-            end
+            template_histogram = append_histogram(template_histogram, point)
         end
     end
-    display(template_histogram)
 
     # Normalize template histogram
     no_of_pixels = sz[1] * sz[2]
-    for rval in 1:2
-        for gval in 1:2
-            for bval in 1:2
-                template_histogram[rval, gval, bval] /= no_of_pixels
-            end
-        end
-    end
-    #display(template_histogram)
+    template_histogram = normalize_histogram(template_histogram, no_of_pixels)
 
     # Compute mean shift and update
     while(true)
@@ -70,46 +53,17 @@ function track(img, template, x)
         region_histogram = zeros(2, 2, 2)
         for i in 1:sz[1]
             for j in 1:sz[2]
-
                 try
                     point = img[Int64(x[1] + i - sz[1]/2), Int64(x[2] + j - sz[2]/2)]
-                    if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))        # red 
-                        region_histogram[1, 2, 2] += 1
-                    elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
-                        region_histogram[2, 1, 2] += 1
-                    elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 1))    # blue
-                        region_histogram[2, 2, 1] += 1
-
-                    elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 0))    # black
-                        region_histogram[2, 2, 2] += 1
-                    elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 1))    # white
-                        region_histogram[1, 1, 1] += 1
-        
-                    # Mixes of two colors
-                    elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 0))
-                        region_histogram[1, 1, 2] += 1
-                    elseif ((red(point) == 1) && (blue(point) == 0) && (green(point) == 1))
-                        region_histogram[1, 2, 1] += 1
-                    elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 1))
-                        region_histogram[2, 1, 1] += 1
-                    end
+                    append_histogram(region_histogram, point)
                 catch BoundsError
                     println("Bounds Error")
-                    
                 end
-
             end
         end
 
         # Normalize histogram
-        for rval in 1:2
-            for gval in 1:2
-                for bval in 1:2
-                    region_histogram[rval, gval, bval] /= no_of_pixels
-                end
-            end
-        end
-        #display(region_histogram)
+        region_histogram = normalize_histogram(region_histogram, no_of_pixels)
         
         # Compute weight
         w = zeros(sz[1], sz[2])
@@ -119,7 +73,7 @@ function track(img, template, x)
                 try
                     point = img[Int64(x[1] + i - sz[1]/2), Int64(x[2] + j - sz[2]/2)]
                     
-                    if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))         # red 
+                    if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))        # red 
                         w[i, j] += sqrt(template_histogram[1, 2, 2] / region_histogram[1, 2, 2])
                     elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
                         w[i, j] += sqrt(template_histogram[2, 1, 2] / region_histogram[2, 1, 2])
@@ -187,8 +141,40 @@ function track(img, template, x)
     end
 end
 
-function construct_histogram()
+# This function helps with constructing histograms.
+function append_histogram(histogram, point)
+    if ((red(point) == 1) && (blue(point) == 0) && (green(point) == 0))        # red 
+        histogram[1, 2, 2] += 1
+    elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 0))    # green
+        histogram[2, 1, 2] += 1
+    elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 1))    # blue
+        histogram[2, 2, 1] += 1
+    elseif ((red(point) == 0) && (blue(point) == 0) && (green(point) == 0))    # black
+        histogram[2, 2, 2] += 1
+    elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 1))    # white
+        histogram[1, 1, 1] += 1
 
+    # Mixes of two colors
+    elseif ((red(point) == 1) && (blue(point) == 1) && (green(point) == 0))
+        histogram[1, 1, 2] += 1
+    elseif ((red(point) == 1) && (blue(point) == 0) && (green(point) == 1))
+        histogram[1, 2, 1] += 1
+    elseif ((red(point) == 0) && (blue(point) == 1) && (green(point) == 1))
+        histogram[2, 1, 1] += 1
+    end
+
+    return histogram
+end
+
+function normalize_histogram(histogram, no_of_pixels)
+    for rval in 1:2
+        for gval in 1:2
+            for bval in 1:2
+                histogram[rval, gval, bval] /= no_of_pixels
+            end
+        end
+    end
+    return histogram
 end
 
 main()

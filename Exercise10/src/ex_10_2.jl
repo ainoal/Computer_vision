@@ -2,6 +2,9 @@ using MAT
 using Plots
 using Images
 
+# Because I have used pixel-wise calculation of differences instead of calculating
+# A and b, both exercise 10.1 and 10.2 give the same result for both image sequences.
+
 function main()
     slow_data = matread(joinpath(@__DIR__, "../data/slow_square.mat"))
     track(slow_data, "slow_square")
@@ -62,7 +65,7 @@ function track(data, seq_name)
                     for m in 1:sz[2]
                         template_coord = [l, m]
                         thisimg_coord = Vector{Int64}([p[1] + l + dx; p[2] + m + dy])
-                        c += ssd(template_coord, thisimg_coord, template, thisimg)
+                        c += diff(template_coord, thisimg_coord, template, thisimg)
                     end
                 end
                 if (c > largest_similarity)
