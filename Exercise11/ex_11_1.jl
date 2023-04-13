@@ -27,8 +27,6 @@ function abs_orientation(pointset_P, pointset_Q)
     # Calculate the centroids of the point sets
     mean_P = mean(pointset_P)
     mean_Q = mean(pointset_Q)
-    #println(mean_P)
-    #println(mean_Q)
 
     # Calculate P hat and Q hat
     P_hat = pointset_P
@@ -68,6 +66,8 @@ function abs_orientation(pointset_P, pointset_Q)
     matrix_P = hcat(pointset_P...)
     matrix_Q = hcat(pointset_Q...)
     translation = matrix_Q - X * matrix_P
+
+    return translation
 end
 
 main()
