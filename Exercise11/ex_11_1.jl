@@ -11,8 +11,8 @@ function main()
     Q3 = [-1.644; 0.765; 1.000]
 
     t = abs_orientation([P1, P2, P3], [Q1, Q2, Q3])
-    #display(t)
-    #print("\n")
+    display(t)
+    print("\n")
 
     # Add a 4th point to the set and test the implementation with
     # the new set of points.
@@ -20,7 +20,7 @@ function main()
     Q4 = [-0.235; 0.644; 1.000]
 
     t2 = abs_orientation([P1, P2, P3, P4], [Q1, Q2, Q3, Q4])
-    #display(t2)
+    display(t2)
 
     # The solutions for the first data set and the data set with an added
     # fourth point are different. With the 3 point set the determinant of X
@@ -61,14 +61,12 @@ function abs_orientation(pointset_P, pointset_Q)
     # Calculate the determinant det(X)
     determinant = det(X)
     if (determinant < 0)
-        #println("Negative determinant of X")
+        println("Negative determinant of X")
     else
-        #println("Positive determinant of X")
+        println("Positive determinant of X")
     end
 
     # Calculate the translation
-    #matrix_P = hcat(pointset_P...)
-    #matrix_Q = hcat(pointset_Q...)
     translation = mean_Q - X * mean_P
 
     return translation
