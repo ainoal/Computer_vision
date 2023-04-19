@@ -9,6 +9,17 @@ function main()
     points = data["points"]
     plt = plot(points[1, :], points[2, :], seriestype=:scatter, aspect_ratio=:equal)
     display(plt)
+    
+    # Line fitting
+    rangex = [-150, 100]
+    rangey = [-80, 80]
+    fitted_circle = plot_shape(rangex, rangey, points)
+    plt2 = fitted_circle[1]
+    a = fitted_circle[2]
+    b = fitted_circle[3]
+    c = fitted_circle[4]
+    d = fitted_circle[5]
+    display(plt2)
 
     # Implement RANSAC
     # Step 1: Randomly select a minimal sample of data points and
@@ -21,23 +32,28 @@ function main()
     for i in 1:s
         min_sample_points[:, i] = points[:, min_sample[i]]
     end
+
+    # Step 2: determine the set of data within a treshold d of the model.
+    # Use algebraic error for tresholding the points.
+    d = 0.1
+    ms_x = min_sample_points[1, :]
+    ms_y = min_sample_points[2, :]
     
-    rangex = [-150, 100]
-    rangey = [-80, 80]
-
-    plt2 = plot_shape(rangex, rangey, points)
-    display(plt2)
-
-    #for pt in 1:s
-        # If point is inlier
-        #if min_sample_points[:, pt]
-        # Else if point is outlier
-    #end
+    for pt in 1:s
+        val = abs(a * ((ms_x[pt])^2 + (ms_y[pt])^2) + b * ms_x[pt] + c * ms_y[pt] + d)
+        println(val)
+        if (val < 0.1)
+            # Point is inlier
+            println("inlier")
+        else
+            # Point is outlier
+        end
+    end
 
 
 end
 
-# The function plots a circle
+# Fit a circular line into a point set
 function plot_shape(rangex, rangey, points)
     columns = 4
     sz = size(points)[2]
@@ -74,7 +90,7 @@ function plot_shape(rangex, rangey, points)
         aspect_ratio=:equal
     )
 
-    return cont
+    return [cont, a, b, c, d]
 end
 
 main()
