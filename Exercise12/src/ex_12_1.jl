@@ -28,10 +28,7 @@ function main()
     sz = size(points)[2]
     perm = randperm(sz)
     min_sample = perm[1:s]
-    min_sample_points = zeros(2, s)
-    for i in 1:s
-        min_sample_points[:, i] = points[:, min_sample[i]]
-    end
+    min_sample_points = points[:, min_sample]
 
     # Step 2: determine the set of data within a treshold d of the model.
     # Use algebraic error for tresholding the points.
@@ -44,7 +41,6 @@ function main()
         println(val)
         if (val < 0.1)
             # Point is inlier
-            println("inlier")
         else
             # Point is outlier
         end
