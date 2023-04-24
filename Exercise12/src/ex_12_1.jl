@@ -18,7 +18,6 @@ function main()
     b = fitted_circle[3]
     c = fitted_circle[4]
     d = fitted_circle[5]
-    #display(plt2)
 
     cont = contour!(
         range(rangex[1], rangex[2], 1000),
@@ -34,12 +33,15 @@ function main()
     # Implement RANSAC
     # Repeat steps 1 and 2 until the size of the consistent set (inliers)
     # is greater than treshold t.
+    s = 10
     t = 360
-    #N = log10(1 - p) / log10(1 - (1 - e))
-    N = 10
+    p = 0.99
+    e = 0.3
+    N = log(1 - p) / log(1 - (1 - e)^s)
     largest_set = 0
     largest_set_points = []
     best_model = [0, 0, 0, 0, 0]
+
     for n in 1:N
         circlefit = RANSAC_iter(points)
         inliers = circlefit[1]
@@ -53,6 +55,7 @@ function main()
 
         # If the size of the consistent set is greater than t, re-estimate
         # the model using the inliers and terminate.
+         # If the size of the consistent set is smaller than t, repeat all steps.
         if (num_inliers >= t)
             inlier_matrix = hcat(inliers...)
             circlefit = RANSAC_iter(inlier_matrix)
@@ -64,11 +67,10 @@ function main()
                 largest_set_points = inliers
                 best_model = model
             end
-            println("here")
             break
-        # If the size of the consistent set is smaller than t, repeat from 1.
         end
     end
+
     f2 = best_model[1]
     a2 = best_model[2]
     b2 = best_model[3]
@@ -80,11 +82,11 @@ function main()
         range(rangey[1], rangey[2], 1000),
         f2,
         levels=0:0,
-        color=:red,
+        color=:orange,
         colorbar=nothing, 
         linewidth=2,
         aspect_ratio=:equal
-    )
+    );
 
     # The fit using RANSAC is better than without it because outliers influence
     # the model less.
@@ -118,9 +120,8 @@ function RANSAC_iter(points)
     inliers = []
     for i in 1:sz
         val = abs(a * ((x[i])^2 + (y[i])^2) + b * x[i] + c * y[i] + d)
-        #println(val)
         if (val < treshold)
-            # Point is inlier
+            # Point is an inlier
             push!(inliers, points[:, i])
         end
     end
@@ -143,7 +144,6 @@ function fit_circle(points)
 
     end
 
-    display(X)
     # Use SVD for solving the resulting set of linear equations.
     svd_vals = svd(X)
     V = svd_vals.V
