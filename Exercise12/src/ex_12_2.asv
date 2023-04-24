@@ -34,10 +34,7 @@ black = [black(1)/black(3); black(2)/black(3)]
 
 % Compare with the given 2D points
 fprintf("Distances between projected points and given 2D points");
-dist_red = calc_distance_2d(double(red_projected), red)
-dist_green = calc_distance_2d(double(green_projected), green)
-dist_blue = calc_distance_2d(double(blue_projected), blue)
-dist_black = calc_distance_2d(double(black_projected), black)
+
 
 function point_dehomogenized = estimate_location(projected_point, projection_matrix, z_coordinate)
     A = double([projection_matrix(:, 1) projection_matrix(:, 2) -[double(projected_point); 1] ...
